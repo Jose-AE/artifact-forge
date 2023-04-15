@@ -5,11 +5,11 @@ import { Artifact } from "../utils/artifactType";
 
 const router = express.Router();
 
-router.post("/generate-artifact", async (req: Request, res: Response) => {
+router.post("/generate-artifact", (req: Request, res: Response) => {
   res.send(generateArtifact(req.body.domain));
 });
 
-router.post("/level-up-artifact", async (req: Request, res: Response) => {
+router.post("/level-up-artifact", (req: Request, res: Response) => {
   const { artifact, levels } = req.body;
   res.send(levelUpArtifact(levels, artifact));
 });
