@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import mongoose, { Mongoose } from "mongoose";
+import verifyToken from "./middleware/verifyToken";
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -12,8 +13,8 @@ app.use(cors({ origin: process.env.CLIENT_URL }));
 import artifactRoutes from "./routes/artifactRoutes";
 import userRoutes from "./routes/userRoutes";
 
-app.use("/", artifactRoutes);
-app.use("/", userRoutes);
+app.use("/user", userRoutes);
+app.use("/artifact", verifyToken, artifactRoutes);
 
 const PORT = process.env.PORT || 3000;
 

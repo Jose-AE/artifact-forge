@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel";
+import bcrypt from "bcrypt";
 
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -19,36 +20,48 @@ router.post("/login", (req: Request, res: Response) => {
     })
     .then(async (response) => {
       const username = response.data.given_name;
-      const email = response.data.email;
+      const googleId = response.data.sub;
       const pfp = response.data.picture;
 
-      const existingUser = await User.findOne({ email });
+      const existingUser = await User.findOne({ googleId });
 
       if (!existingUser) {
         //create new user
-        const createdUser = await User.create({ email, username, pfp });
 
-        const token = jwt.sign(
-          {
-            email: createdUser.email,
-            id: createdUser._id,
-          },
-          process.env.JWT_SECRET as string,
-          { expiresIn: "1h" }
-        );
-        res.status(200).json({ user: createdUser, token });
+        try {
+          const createdUser = await User.create({
+            googleId,
+            username,
+            pfp,
+          });
+
+          const token = jwt.sign(
+            {
+              userId: createdUser._id,
+            },
+            process.env.JWT_SECRET as string
+          );
+          res.status(200).json({ user: createdUser, token });
+        } catch (error) {
+          console.log(error);
+          res.status(500).send("Server error creating user");
+        }
       } else {
         //sign in user
-        const token = jwt.sign(
-          {
-            email: existingUser.email,
-            id: existingUser._id,
-          },
-          process.env.JWT_SECRET as string,
-          { expiresIn: "1h" }
-        );
 
-        res.status(200).json({ user: existingUser, token });
+        try {
+          const token = jwt.sign(
+            {
+              userId: existingUser._id,
+            },
+            process.env.JWT_SECRET as string
+          );
+
+          res.status(200).json({ user: existingUser, token });
+        } catch (error) {
+          console.log(error);
+          res.status(500).send("Server error validating user token");
+        }
       }
     })
     .catch((err) => {

@@ -2,10 +2,15 @@ import {
   ARTIFACT_MAIN_STATS_UPGRADE_VALUES,
   ARTIFACT_SUB_STATS_ROLL_RANGE,
 } from "../data/artifactStatDistribution";
-import { Artifact } from "./artifactType";
+import { ArtifactI } from "./artifactType";
 import generateSubStat from "./generateSubStat";
 
-export function levelUpArtifact(levels: number, artifact: Artifact): Artifact {
+export function levelUpArtifact(
+  levels: number,
+  artifact: ArtifactI
+): ArtifactI {
+  levels = Math.abs(levels); // make sure levels are possitive
+
   const mainStat = Object.keys(artifact.mainStat)[0];
   const origLevel = artifact.level;
   artifact.level = Math.min(artifact.level + levels, 20);

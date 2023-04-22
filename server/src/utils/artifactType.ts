@@ -1,4 +1,4 @@
-export interface Artifact {
+export interface ArtifactI {
   level: number;
   set: string;
   type: string;
