@@ -11,8 +11,7 @@ export default function verifyToken(
   next: NextFunction
 ) {
   //const token = req.headers.authorization?.split(" ")[1];
-  const token = "ddd"; //req.headers.cookie?.split("; ")[1].split("=")[1];
-  console.log(req);
+  const token = req.cookies.token; //req.headers.cookie?.split("; ")[1].split("=")[1];
 
   if (!token) {
     return res.status(401).json({ error: "No token provided" });

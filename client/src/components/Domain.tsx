@@ -75,7 +75,7 @@ export default function Domain({ name, artifacts, domainId }: DomainProps) {
                   { withCredentials: true }
                 )
                 .then((res) => {
-                  console.log(res);
+                  console.log(res.data.owner);
                 })
                 .catch((err) => {
                   console.log(err);

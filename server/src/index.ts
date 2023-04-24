@@ -8,13 +8,13 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cookieParser());
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
+app.use(cookieParser());
 
 //routes
 import artifactRoutes from "./routes/artifactRoutes";
