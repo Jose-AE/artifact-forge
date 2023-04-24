@@ -1,4 +1,5 @@
 export const DOMAIN_ARTIFACTS = [
+  ["Gladiator's Finale", "Wanderer's Troupe"],
   ["Thundering Fury", "Thundersoother"],
   ["Viridescent Venerer", "Maiden Beloved"],
   ["Archaic Petra", "Retracing Bolide"],

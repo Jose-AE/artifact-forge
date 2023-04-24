@@ -41,6 +41,7 @@ router.post("/login", (req: Request, res: Response) => {
             },
             process.env.JWT_SECRET as string
           );
+
           res.status(200).json({ user: createdUser, token });
         } catch (error) {
           console.log(error);

@@ -10,7 +10,9 @@ export default function verifyToken(
   res: Response,
   next: NextFunction
 ) {
-  const token = req.headers.authorization?.split(" ")[1];
+  //const token = req.headers.authorization?.split(" ")[1];
+  const token = "ddd"; //req.headers.cookie?.split("; ")[1].split("=")[1];
+  console.log(req);
 
   if (!token) {
     return res.status(401).json({ error: "No token provided" });
@@ -26,6 +28,6 @@ export default function verifyToken(
 
     next();
   } catch (err) {
-    return res.status(401).json({ error: err });
+    return res.status(401).json({ error: "JWT Invalid" });
   }
 }
