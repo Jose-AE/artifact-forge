@@ -11,7 +11,7 @@ import { weightedChoice } from "./weightedChoice";
 import generateSubStat from "./generateSubStat";
 
 export default function generateArtifact(domain: number): ArtifactI {
-  domain = domain >= 0 && domain <= DOMAIN_ARTIFACTS.length - 1 ? domain : 0; //make sure domain is valid, else default to 0
+  domain = domain >= 0 && domain <= DOMAIN_ARTIFACTS.length ? domain : 0; //make sure domain is valid, else default to 0
 
   const level = 0;
   const set = DOMAIN_ARTIFACTS[domain][Math.floor(Math.random() * 2)];

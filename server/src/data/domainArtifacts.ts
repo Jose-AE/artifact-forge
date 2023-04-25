@@ -11,5 +11,6 @@ export const DOMAIN_ARTIFACTS = [
   ["husk_of_opulent_dreams", "ocean_hued_clam"],
   ["vermillion_hereafter", "echoes_of_an_offering"],
   ["deepwood_memories", "gilded_dreams"],
+  ["desert_pavilion_chronicle", "flower_of_paradise_lost"],
   ["vourukashas_glow", "nymphs_dream"],
 ];

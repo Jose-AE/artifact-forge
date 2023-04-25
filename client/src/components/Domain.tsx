@@ -15,16 +15,14 @@ interface DomainProps {
   name: string;
   domainId: number;
   artifacts: Array<string>;
-  onOpenNewArifactModal(): void;
-  setGeneratedArtifact: Dispatch<ArtifactType>;
+  generateArtifact(id: number): void;
 }
 
 export default function Domain({
   name,
   artifacts,
   domainId,
-  onOpenNewArifactModal,
-  setGeneratedArtifact,
+  generateArtifact,
 }: DomainProps) {
   return (
     <>
@@ -76,21 +74,7 @@ export default function Domain({
           </Heading>
           <Button
             onClick={() => {
-              axios
-                .post(
-                  import.meta.env.VITE_API_URI + "/artifact/generate",
-                  {
-                    domain: domainId,
-                  },
-                  { withCredentials: true }
-                )
-                .then((res) => {
-                  setGeneratedArtifact(res.data);
-                  onOpenNewArifactModal();
-                })
-                .catch((err) => {
-                  console.log(err);
-                });
+              generateArtifact(domainId);
             }}
           >
             Generate

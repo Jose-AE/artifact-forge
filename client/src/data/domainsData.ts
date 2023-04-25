@@ -37,7 +37,7 @@ export const DOMAINS = [
   },
   {
     name: "Slumbering Court",
-    artifacts: ["husk_of_opulent_dreams", "ocean-hued_clam"],
+    artifacts: ["husk_of_opulent_dreams", "ocean_hued_clam"],
   },
   {
     name: "The Lost Valley",

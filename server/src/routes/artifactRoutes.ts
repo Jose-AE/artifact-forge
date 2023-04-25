@@ -68,6 +68,8 @@ router.post("/level-up", async (req: AuthenticatedRequest, res: Response) => {
 router.post("/set-locked", async (req: AuthenticatedRequest, res: Response) => {
   const { artifactId, locked } = req.body;
 
+  console.log(locked);
+
   if (artifactId && typeof locked == "boolean") {
     try {
       if (await checkArtifactOwnership(artifactId, req.userId as string)) {
@@ -130,6 +132,28 @@ router.post("/vote", async (req: AuthenticatedRequest, res: Response) => {
       }
     } catch (error) {
       console.error(error);
+      res.status(500).send("Invalid artifact id");
+    }
+  } else {
+    res.status(500).send("Invalid request body ");
+  }
+});
+
+router.post("/delete", async (req: Request | any, res: Response) => {
+  const { artifactId } = req.body;
+
+  if (typeof artifactId == "string") {
+    try {
+      if (await checkArtifactOwnership(artifactId, req.userId as string)) {
+        await Artifact.deleteOne({
+          _id: artifactId,
+        });
+
+        res.status(202).send("Artifact deleted");
+      } else {
+        res.status(403).send("User does not own artifact");
+      }
+    } catch (error) {
       res.status(500).send("Invalid artifact id");
     }
   } else {

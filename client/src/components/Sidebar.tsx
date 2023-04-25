@@ -23,6 +23,7 @@ import {
   FiMenu,
   FiArchive,
   FiBox,
+  FiLock,
 } from "react-icons/fi";
 import {
   BiCustomize,
