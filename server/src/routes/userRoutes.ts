@@ -3,15 +3,43 @@ import axios from "axios";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel";
 import * as dotenv from "dotenv";
+import verifyToken from "../middleware/verifyToken";
 dotenv.config();
 
 const router = express.Router();
 
+////
+//Logout user route
+////
 router.get("/logout", (req: Request, res: Response) => {
   res.clearCookie("token");
   res.status(200).send("User logged out");
 });
 
+////
+//Get logged user route
+////
+router.get("/get", (req: Request, res: Response) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    res.status(200).send(null);
+  } else {
+    try {
+      const { pfp, username } = jwt.verify(
+        token,
+        process.env.JWT_SECRET as string
+      ) as any;
+      res.status(200).send({ pfp, username });
+    } catch (err) {
+      res.status(401).send("Invalid jwt");
+    }
+  }
+});
+
+////
+//Login user route
+////
 router.post("/login", (req: Request, res: Response) => {
   const { googleAccessToken } = req.body;
 
@@ -41,6 +69,8 @@ router.post("/login", (req: Request, res: Response) => {
           const token = jwt.sign(
             {
               userId: createdUser._id,
+              username,
+              pfp,
             },
             process.env.JWT_SECRET as string
           );
@@ -52,7 +82,7 @@ router.post("/login", (req: Request, res: Response) => {
             sameSite: "lax",
           });
 
-          res.status(201).send("User created");
+          res.status(201).send({ pfp, username });
         } catch (error) {
           console.log(error);
           res.status(500).send("Server error creating user");
@@ -64,6 +94,8 @@ router.post("/login", (req: Request, res: Response) => {
           const token = jwt.sign(
             {
               userId: existingUser._id,
+              username,
+              pfp,
             },
             process.env.JWT_SECRET as string
           );
@@ -75,7 +107,7 @@ router.post("/login", (req: Request, res: Response) => {
             sameSite: "lax",
           });
 
-          res.status(202).send("User logged in");
+          res.status(202).send({ pfp, username });
         } catch (error) {
           res.status(500).send("Server error validating user token");
         }

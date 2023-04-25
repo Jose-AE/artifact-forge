@@ -45,7 +45,7 @@ const LinkItems: Array<LinkItemProps> = [
   { name: "Generate", icon: BiPlusCircle, location: "/generate" },
   { name: "Inventory", icon: BiCategory, location: "/inventory" },
   { name: "Explore", icon: BiCompass, location: "/generate" },
-  { name: "Settings", icon: BiCog, location: "/generate" },
+  { name: "Settings", icon: BiCog, location: "/settings" },
 ];
 
 export default function Sidebar({ children }: { children: ReactNode }) {

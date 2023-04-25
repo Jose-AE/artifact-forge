@@ -1,16 +1,19 @@
 import { Button } from "@chakra-ui/react";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
-import Cookies from "js-cookie";
+import { useContext } from "react";
+import { LoginContext } from "../App";
 
 export default function LoginButton() {
+  const { loggedUser, setLoggedUser } = useContext(LoginContext);
+
   function logout() {
     axios
       .get(import.meta.env.VITE_API_URI + "/user/logout", {
         withCredentials: true,
       })
       .then((res) => {
-        //console.log(res);
+        setLoggedUser(null);
       })
       .catch((err) => {
         console.log(err);
@@ -28,7 +31,7 @@ export default function LoginButton() {
           { withCredentials: true }
         )
         .then((res) => {
-          //console.log(res);
+          setLoggedUser(res.data);
         })
         .catch((err) => {
           console.log(err);
@@ -38,8 +41,11 @@ export default function LoginButton() {
 
   return (
     <>
-      <Button onClick={() => login()}>Sign in with Google</Button>
-      <Button onClick={logout}>Logout</Button>
+      {loggedUser ? (
+        <Button onClick={logout}>Logout</Button>
+      ) : (
+        <Button onClick={() => login()}>Sign in with Google</Button>
+      )}
     </>
   );
 }
