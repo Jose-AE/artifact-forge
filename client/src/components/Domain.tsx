@@ -8,14 +8,24 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import axios from "axios";
+import { ArtifactType } from "../types/artifactType";
+import { Dispatch } from "react";
 
 interface DomainProps {
   name: string;
   domainId: number;
   artifacts: Array<string>;
+  onOpenNewArifactModal(): void;
+  setGeneratedArtifact: Dispatch<ArtifactType>;
 }
 
-export default function Domain({ name, artifacts, domainId }: DomainProps) {
+export default function Domain({
+  name,
+  artifacts,
+  domainId,
+  onOpenNewArifactModal,
+  setGeneratedArtifact,
+}: DomainProps) {
   return (
     <>
       <Box
@@ -75,7 +85,8 @@ export default function Domain({ name, artifacts, domainId }: DomainProps) {
                   { withCredentials: true }
                 )
                 .then((res) => {
-                  console.log(res.data.owner);
+                  setGeneratedArtifact(res.data);
+                  onOpenNewArifactModal();
                 })
                 .catch((err) => {
                   console.log(err);
