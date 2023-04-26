@@ -2,11 +2,25 @@ import express, { Request, Response } from "express";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel";
+import Artifact from "../models/artifactModel";
+
 import * as dotenv from "dotenv";
 import verifyToken from "../middleware/verifyToken";
 dotenv.config();
 
 const router = express.Router();
+
+////
+//Get logged user artifacts
+////
+router.get("/artifacts", verifyToken, async (req: any, res: Response) => {
+  try {
+    const artifacts = await Artifact.find({ owner: req.userId });
+    res.status(200).send(artifacts);
+  } catch (err) {
+    res.status(401).send("Error getting artifacts");
+  }
+});
 
 ////
 //Logout user route
