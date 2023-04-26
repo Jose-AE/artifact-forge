@@ -98,22 +98,42 @@ export default function InventoryPage() {
       });
   }, []);
 
-  function sortArtifacts(
-    artifact1: ArtifactType,
-    artifact2: ArtifactType
-  ): number {
-    console.log(artifact1, artifact2);
-    if (!statFilter && !setFilter) {
-      return artifact1.artifactData.set.localeCompare(
-        artifact2.artifactData.set
-      );
-    }
+  function filterAndSortArtifacts(): Array<ArtifactType> {
+    let filteredArtifacts = userArtifacts;
+    //filter stat
+    filteredArtifacts = statFilter
+      ? userArtifacts.filter(
+          (artifact) => artifact.artifactData.mainStat[statFilter] !== undefined
+        )
+      : userArtifacts;
 
-    /*
-    If the result is negative a is sorted before b.
-    If the result is positive b is sorted before a.
-    If the result is 0 no changes are done with the sort order of the two values.
-    */
+    //filter set
+    filteredArtifacts = setFilter
+      ? filteredArtifacts.filter(
+          (artifact) => artifact.artifactData.set === setFilter
+        )
+      : filteredArtifacts;
+
+    filteredArtifacts.sort((a, b) => {
+      // Sort by level (in descending order)
+      if (b.artifactData.level !== a.artifactData.level) {
+        return b.artifactData.level - a.artifactData.level;
+      }
+
+      // Sort by set
+      if (a.artifactData.set !== b.artifactData.set) {
+        return a.artifactData.set.localeCompare(b.artifactData.set);
+      }
+
+      // Sort by type
+      if (a.artifactData.type !== b.artifactData.type) {
+        return a.artifactData.type.localeCompare(b.artifactData.type);
+      }
+
+      return 0;
+    });
+
+    return filteredArtifacts;
   }
 
   return (
@@ -123,7 +143,7 @@ export default function InventoryPage() {
       <Searchbar setSetFilter={setSetFilter} setStatFilter={setStatFilter} />
       <Box h="65vh" overflowY="auto" mt="10px">
         <SimpleGrid columns={8} gap={3} minChildWidth="80px">
-          {userArtifacts.sort(sortArtifacts).map((artifact, i) => {
+          {filterAndSortArtifacts().map((artifact, i) => {
             return <Artifact key={i} thisArtifact={artifact} />;
           })}
         </SimpleGrid>
