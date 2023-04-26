@@ -5,7 +5,6 @@ import Sidebar from "./components/Sidebar";
 import InventoryPage from "./pages/InventoryPage";
 import SettingsPage from "./pages/SettingsPage";
 import axios from "axios";
-import { Button } from "@chakra-ui/react";
 
 export const LoginContext = createContext<any>(null);
 

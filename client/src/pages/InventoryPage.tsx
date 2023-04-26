@@ -6,6 +6,9 @@ import {
   Text,
   useDisclosure,
   Image,
+  Flex,
+  Grid,
+  CloseButton,
 } from "@chakra-ui/react";
 
 import Domain from "../components/Domain";
@@ -19,24 +22,39 @@ import {
   ARTIFACT_STAT_NAME_ALIASES,
 } from "../data/nameAliasesData";
 
+import { BiLockAlt, BiLockOpenAlt, BiTrash } from "react-icons/bi";
+import { HiLockClosed } from "react-icons/hi";
+
 function Artifact({ thisArtifact }: { thisArtifact: ArtifactType }) {
   const formatedArtifactData = artifactFormatter(thisArtifact);
 
   return (
     <Box
+      maxW="80px"
       borderRadius="5px"
       bg="gray.700"
       _hover={{ bg: "gray.600", cursor: "pointer" }}
     >
       <Image src={formatedArtifactData.image} />
-      <Text
+
+      <Flex
+        visibility={thisArtifact.locked ? "visible" : "hidden"}
+        paddingRight="3px"
+        paddingTop="3px"
+        justifyContent="right"
+      ></Flex>
+
+      <Flex
         borderBottomRadius="5px"
-        bg="gray.500"
-        textAlign="center"
-        fontWeight="600"
+        bg="whiteAlpha.200"
+        justifyContent="center"
+        alignItems="center"
       >
-        {formatedArtifactData.level}
-      </Text>
+        <Text as="b" textAlign="center" mr="3px">
+          {formatedArtifactData.level}
+        </Text>
+        {thisArtifact.locked ? <HiLockClosed color="#F56565" /> : null}
+      </Flex>
     </Box>
   );
 }
@@ -49,8 +67,8 @@ function Searchbar({
   setStatFilter: Dispatch<SetStateAction<string | null>>;
 }) {
   return (
-    <Box borderRadius="5px">
-      <Text>Filter by set</Text>
+    <Box>
+      <Text p="5px">Filter by set</Text>
       <Select
         placeholder="None"
         onChange={(e) => {
@@ -59,11 +77,11 @@ function Searchbar({
       >
         {Object.entries(ARTIFACT_SET_NAME_ALIASES).map((name, i) => (
           <option key={i} value={name[0]}>
-            {name[1]}
+            {name[0]}
           </option>
         ))}
       </Select>
-      <Text>Filter by stat</Text>
+      <Text p="5px">Filter by stat</Text>
       <Select
         placeholder="None"
         onChange={(e) => {
@@ -72,7 +90,7 @@ function Searchbar({
       >
         {Object.entries(ARTIFACT_STAT_NAME_ALIASES).map((name, i) => (
           <option key={i} value={name[0]}>
-            {name[1]}
+            {name[0].slice(-2) === "_P" ? `${name[1]}%` : name[1]}
           </option>
         ))}
       </Select>
@@ -138,15 +156,23 @@ export default function InventoryPage() {
 
   return (
     <>
-      {setFilter}
-      {statFilter}
       <Searchbar setSetFilter={setSetFilter} setStatFilter={setStatFilter} />
-      <Box h="65vh" overflowY="auto" mt="10px">
-        <SimpleGrid columns={8} gap={3} minChildWidth="80px">
+      <Box h={`calc(100vh - ${190}px)`} overflowY="auto" mt="10px">
+        <Grid
+          autoRows="auto"
+          templateColumns={{
+            base: "repeat(4, minmax(0, 1fr))",
+            sm: "repeat(6, minmax(0, 1fr))",
+            md: "repeat(8, minmax(0, 1fr))",
+            lg: "repeat(12, minmax(0, 1fr))",
+            "2xl": "repeat(17, minmax(0, 1fr))",
+          }}
+          gap={3}
+        >
           {filterAndSortArtifacts().map((artifact, i) => {
             return <Artifact key={i} thisArtifact={artifact} />;
           })}
-        </SimpleGrid>
+        </Grid>
       </Box>
     </>
   );
