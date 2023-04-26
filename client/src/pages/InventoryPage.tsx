@@ -77,7 +77,7 @@ function Searchbar({
       >
         {Object.entries(ARTIFACT_SET_NAME_ALIASES).map((name, i) => (
           <option key={i} value={name[0]}>
-            {name[0]}
+            {name[1]}
           </option>
         ))}
       </Select>
