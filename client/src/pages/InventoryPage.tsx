@@ -24,12 +24,25 @@ import {
 
 import { BiLockAlt, BiLockOpenAlt, BiTrash } from "react-icons/bi";
 import { HiLockClosed } from "react-icons/hi";
+import ArtifactInfoWindow from "../components/ArtifactInfoWindow";
 
-function Artifact({ thisArtifact }: { thisArtifact: ArtifactType }) {
+function Artifact({
+  thisArtifact,
+  onOpen,
+  setSelectedArtifact,
+}: {
+  thisArtifact: ArtifactType;
+  onOpen(): void;
+  setSelectedArtifact: Dispatch<SetStateAction<ArtifactType | null>>;
+}) {
   const formatedArtifactData = artifactFormatter(thisArtifact);
 
   return (
     <Box
+      onClick={() => {
+        setSelectedArtifact(thisArtifact);
+        onOpen();
+      }}
       maxW="80px"
       borderRadius="5px"
       bg="gray.700"
@@ -99,9 +112,18 @@ function Searchbar({
 }
 
 export default function InventoryPage() {
+  const [selectedArtifact, setSelectedArtifact] = useState<ArtifactType | null>(
+    null
+  );
   const [userArtifacts, setUserArtifacts] = useState<Array<ArtifactType>>([]);
   const [setFilter, setSetFilter] = useState<string | null>(null);
   const [statFilter, setStatFilter] = useState<string | null>(null);
+
+  const {
+    isOpen: isOpenArifactInfoModal,
+    onOpen: onOpenArifactInfoModal,
+    onClose: onCloseArifactInfoModal,
+  } = useDisclosure();
 
   useEffect(() => {
     axios
@@ -156,6 +178,12 @@ export default function InventoryPage() {
 
   return (
     <>
+      <ArtifactInfoWindow
+        isOpen={isOpenArifactInfoModal}
+        onClose={onCloseArifactInfoModal}
+        onOpen={onOpenArifactInfoModal}
+        selectedArtifact={selectedArtifact}
+      />
       <Searchbar setSetFilter={setSetFilter} setStatFilter={setStatFilter} />
       <Box h={`calc(100vh - ${190}px)`} overflowY="auto" mt="10px">
         <Grid
@@ -170,7 +198,14 @@ export default function InventoryPage() {
           gap={3}
         >
           {filterAndSortArtifacts().map((artifact, i) => {
-            return <Artifact key={i} thisArtifact={artifact} />;
+            return (
+              <Artifact
+                key={i}
+                setSelectedArtifact={setSelectedArtifact}
+                thisArtifact={artifact}
+                onOpen={onOpenArifactInfoModal}
+              />
+            );
           })}
         </Grid>
       </Box>
