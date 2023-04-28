@@ -22,7 +22,7 @@ import { BiLockAlt, BiLockOpenAlt, BiTrash } from "react-icons/bi";
 
 import artifactFormatter from "../utils/arifactFormatter";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { ArtifactType } from "../types/artifactType";
 import { BiRadioCircleMarked } from "react-icons/bi";
 import { FiArrowUp } from "react-icons/fi";
@@ -32,15 +32,19 @@ import { IoPodiumOutline } from "react-icons/io5";
 interface ArtifactInfoWindowProps {
   isOpen: boolean;
   onClose(): void;
-  onOpen(): void;
+  userArtifacts: Array<ArtifactType>;
   selectedArtifact: ArtifactType | null;
+  setUserArtifacts: Dispatch<SetStateAction<ArtifactType[]>>;
+  setSelectedArtifact: Dispatch<SetStateAction<ArtifactType | null>>;
 }
 
 export default function ArtifactInfoWindow({
   isOpen,
   onClose,
-  onOpen,
+  userArtifacts,
   selectedArtifact,
+  setUserArtifacts,
+  setSelectedArtifact,
 }: ArtifactInfoWindowProps) {
   const [formattedArtifactData, setFormattedArtifactData] = useState<{
     image: string;
@@ -53,18 +57,39 @@ export default function ArtifactInfoWindow({
 
   const [locked, setLocked] = useState<boolean>(false);
 
+  //find out why selected artifact is not getting updated
   useEffect(() => {
+    console.log(selectedArtifact);
     if (selectedArtifact) {
       setFormattedArtifactData(artifactFormatter(selectedArtifact) as any);
       setLocked(selectedArtifact.locked);
     }
   }, [selectedArtifact]);
 
+  function updateArtifact(newArtifact: ArtifactType | null) {
+    if (newArtifact) {
+      setUserArtifacts([
+        ...userArtifacts.filter(
+          (artifact) => artifact._id !== newArtifact?._id
+        ),
+        newArtifact,
+      ]);
+    } else {
+      //if no artifact remove it
+      setUserArtifacts(
+        userArtifacts.filter(
+          (artifact) => artifact._id !== selectedArtifact?._id
+        )
+      );
+    }
+    setSelectedArtifact(newArtifact);
+  }
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent w="500px">
+        <ModalContent w="280px">
           <ModalCloseButton />
           <Flex p={6} direction="column" alignItems="center">
             <Image h="100px" w="100px" src={formattedArtifactData?.image} />
@@ -110,26 +135,74 @@ export default function ArtifactInfoWindow({
               ) : null}
             </List>
 
-            <Flex mt="20px">
+            <Flex
+              w="230px"
+              mt="20px"
+              align-items="center"
+              justifyContent="space-between"
+            >
+              {/*Level up buttons */}
               <Button
+                w="50%"
                 isDisabled={selectedArtifact?.artifactData.level === 20}
                 leftIcon={<FiArrowUp />}
-                onClick={() => {}}
+                onClick={() => {
+                  axios
+                    .post(
+                      import.meta.env.VITE_API_URI + "/artifact/level-up",
+                      {
+                        artifactId: selectedArtifact?._id,
+                        levels: 4,
+                      },
+                      { withCredentials: true }
+                    )
+                    .then((res) => {
+                      updateArtifact(res.data);
+                    });
+                }}
                 mr="10px"
               >
                 +4
               </Button>
               <Button
+                w="50%"
                 isDisabled={selectedArtifact?.artifactData.level === 20}
                 leftIcon={<FiArrowUp />}
-                onClick={() => {}}
-                mr="10px"
+                onClick={() => {
+                  axios
+                    .post(
+                      import.meta.env.VITE_API_URI + "/artifact/level-up",
+                      {
+                        artifactId: selectedArtifact?._id,
+                        levels: 20,
+                      },
+                      { withCredentials: true }
+                    )
+                    .then((res) => {
+                      updateArtifact(res.data);
+                    });
+                }}
               >
                 +20
               </Button>
+            </Flex>
+
+            <Flex mt="10px">
               <IconButton
                 onClick={() => {
-                  setLocked(!locked);
+                  axios
+                    .post(
+                      import.meta.env.VITE_API_URI + "/artifact/set-locked",
+                      {
+                        artifactId: selectedArtifact?._id,
+                        locked: !locked,
+                      },
+                      { withCredentials: true }
+                    )
+                    .then((res) => {
+                      console.log("locked set to ", !locked);
+                      updateArtifact(res.data);
+                    });
                 }}
                 icon={
                   locked ? (
@@ -170,6 +243,20 @@ export default function ArtifactInfoWindow({
                 isDisabled={locked}
                 aria-label="trash"
                 icon={<BiTrash size="25px" />}
+                onClick={() => {
+                  axios
+                    .post(
+                      import.meta.env.VITE_API_URI + "/artifact/delete",
+                      {
+                        artifactId: selectedArtifact?._id,
+                      },
+                      { withCredentials: true }
+                    )
+                    .then((res) => {
+                      onClose();
+                      updateArtifact(null);
+                    });
+                }}
               />
             </Flex>
           </Flex>

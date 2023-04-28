@@ -23,7 +23,7 @@ export default function artifactFormatter(
 
   const mainstat = `${
     ARTIFACT_STAT_NAME_ALIASES[Object.keys(artifactData.mainStat)[0]]
-  } +${Object.values(artifactData.mainStat)[0]}${
+  } +${Math.round(Object.values(artifactData.mainStat)[0] * 10) / 10}${
     NOT_PERCENT_STATS.includes(Object.keys(artifactData.mainStat)[0]) ? "" : "%"
   }`;
 
@@ -34,7 +34,7 @@ export default function artifactFormatter(
   const substats = Object.keys(artifactData.subStats).map(
     (statName) =>
       `${ARTIFACT_STAT_NAME_ALIASES[statName]}+${
-        artifactData.subStats[statName]
+        Math.round(artifactData.subStats[statName] * 10) / 10
       }${NOT_PERCENT_STATS.includes(statName) ? "" : "%"}`
   );
 

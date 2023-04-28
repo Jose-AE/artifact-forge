@@ -179,9 +179,11 @@ export default function InventoryPage() {
   return (
     <>
       <ArtifactInfoWindow
+        setSelectedArtifact={setSelectedArtifact}
+        setUserArtifacts={setUserArtifacts}
         isOpen={isOpenArifactInfoModal}
         onClose={onCloseArifactInfoModal}
-        onOpen={onOpenArifactInfoModal}
+        userArtifacts={userArtifacts}
         selectedArtifact={selectedArtifact}
       />
       <Searchbar setSetFilter={setSetFilter} setStatFilter={setStatFilter} />

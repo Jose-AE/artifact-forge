@@ -68,13 +68,13 @@ router.post("/level-up", async (req: AuthenticatedRequest, res: Response) => {
 router.post("/set-locked", async (req: AuthenticatedRequest, res: Response) => {
   const { artifactId, locked } = req.body;
 
-  console.log(locked);
-
   if (artifactId && typeof locked == "boolean") {
     try {
       if (await checkArtifactOwnership(artifactId, req.userId as string)) {
-        await Artifact.findByIdAndUpdate(artifactId, { locked });
-        res.status(202).send("Artifact locked/unlocked");
+        const artifact = await Artifact.findByIdAndUpdate(artifactId, {
+          locked,
+        });
+        res.status(202).send(artifact);
       } else {
         res.status(403).send("User does not own artifact");
       }
