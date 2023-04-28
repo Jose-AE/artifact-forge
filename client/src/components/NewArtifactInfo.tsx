@@ -118,7 +118,6 @@ export default function NewArtifactInfo({
                       import.meta.env.VITE_API_URI + "/artifact/set-locked",
                       {
                         artifactId: generatedArtifact?._id,
-                        locked: !locked,
                       },
                       { withCredentials: true }
                     )

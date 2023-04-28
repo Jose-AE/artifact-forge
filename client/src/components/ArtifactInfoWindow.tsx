@@ -59,7 +59,6 @@ export default function ArtifactInfoWindow({
 
   //find out why selected artifact is not getting updated
   useEffect(() => {
-    console.log(selectedArtifact);
     if (selectedArtifact) {
       setFormattedArtifactData(artifactFormatter(selectedArtifact) as any);
       setLocked(selectedArtifact.locked);
@@ -188,6 +187,7 @@ export default function ArtifactInfoWindow({
             </Flex>
 
             <Flex mt="10px">
+              {/* Lock button*/}
               <IconButton
                 onClick={() => {
                   axios
@@ -195,12 +195,10 @@ export default function ArtifactInfoWindow({
                       import.meta.env.VITE_API_URI + "/artifact/set-locked",
                       {
                         artifactId: selectedArtifact?._id,
-                        locked: !locked,
                       },
                       { withCredentials: true }
                     )
                     .then((res) => {
-                      console.log("locked set to ", !locked);
                       updateArtifact(res.data);
                     });
                 }}
