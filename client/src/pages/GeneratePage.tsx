@@ -51,7 +51,7 @@ export default function GeneratePage() {
           toast.closeAll();
           toast({
             title: "An error occured",
-            description: "We've created your account for you.",
+            description: "Could not generate artifact",
             status: "error",
             duration: 2000,
             isClosable: false,
