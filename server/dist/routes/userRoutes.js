@@ -93,6 +93,7 @@ router.post("/login", (req, res) => {
         },
     })
         .then((response) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a, _b;
         const username = response.data.given_name;
         const googleId = response.data.sub;
         const pfp = response.data.picture;
@@ -113,7 +114,7 @@ router.post("/login", (req, res) => {
                 res.cookie("token", token, {
                     httpOnly: true,
                     maxAge: 1000 * 60 * 60 * 24 * 30,
-                    //domain: "localhost",
+                    domain: (_a = process.env.CLIENT_URL) === null || _a === void 0 ? void 0 : _a.replace("http://", ""),
                     sameSite: "lax",
                 });
                 res.status(201).send({ pfp, username });
@@ -134,7 +135,7 @@ router.post("/login", (req, res) => {
                 res.cookie("token", token, {
                     httpOnly: true,
                     maxAge: 1000 * 60 * 60 * 24 * 30,
-                    //domain: "localhost",
+                    domain: (_b = process.env.CLIENT_URL) === null || _b === void 0 ? void 0 : _b.replace("http://", ""),
                     sameSite: "lax",
                 });
                 res.status(202).send({ pfp, username });

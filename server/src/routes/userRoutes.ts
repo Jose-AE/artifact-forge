@@ -92,7 +92,7 @@ router.post("/login", (req: Request, res: Response) => {
           res.cookie("token", token, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24 * 30, // 14 Day Age,
-            //domain: "localhost",
+            domain: process.env.CLIENT_URL?.replace("http://", ""),
             sameSite: "lax",
           });
 
@@ -117,7 +117,7 @@ router.post("/login", (req: Request, res: Response) => {
           res.cookie("token", token, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24 * 30, // 14 Day Age,
-            //domain: "localhost",
+            domain: process.env.CLIENT_URL?.replace("http://", ""),
             sameSite: "lax",
           });
 
