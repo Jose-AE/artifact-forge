@@ -45,7 +45,7 @@ interface LinkItemProps {
 const LinkItems: Array<LinkItemProps> = [
   { name: "Generate", icon: BiPlusCircle, location: "/generate" },
   { name: "Inventory", icon: BiCategory, location: "/inventory" },
-  { name: "Explore", icon: BiCompass, location: "/generate" },
+  { name: "Explore", icon: BiCompass, location: "/explore" },
   { name: "Settings", icon: BiCog, location: "/settings" },
 ];
 

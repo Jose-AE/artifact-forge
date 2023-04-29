@@ -5,6 +5,7 @@ import Sidebar from "./components/Sidebar";
 import InventoryPage from "./pages/InventoryPage";
 import SettingsPage from "./pages/SettingsPage";
 import axios from "axios";
+import ExplorePage from "./pages/ExplorePage";
 
 export const LoginContext = createContext<any>(null);
 
@@ -39,6 +40,7 @@ function App() {
             <Route path="/generate" element={<GeneratePage />} />
             <Route path="/inventory" element={<InventoryPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/explore" element={<ExplorePage />} />
           </Routes>
         </Sidebar>
       </LoginContext.Provider>
