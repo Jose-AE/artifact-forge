@@ -25,8 +25,8 @@ router.get("/artifacts", verifyToken, async (req: any, res: Response) => {
 ////
 //Logout user route
 ////
-router.get("/logout", (req: Request, res: Response) => {
-  res.clearCookie("token", { path: "/", domain: process.env.COOKIE_DOMAIN });
+router.post("/logout", (req: Request, res: Response) => {
+  res.clearCookie("token");
   res.status(200).send("User logged out");
 });
 

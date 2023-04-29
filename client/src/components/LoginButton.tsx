@@ -9,9 +9,13 @@ export default function LoginButton() {
 
   function logout() {
     axios
-      .get(import.meta.env.VITE_API_URI + "/user/logout", {
-        withCredentials: true,
-      })
+      .post(
+        import.meta.env.VITE_API_URI + "/user/logout",
+        {},
+        {
+          withCredentials: true,
+        }
+      )
       .then((res) => {
         setLoggedUser(null);
       })
