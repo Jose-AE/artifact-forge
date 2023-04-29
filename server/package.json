@@ -11,11 +11,6 @@
     "test": "echo. > test.txt",
     "prepare": "cd .. && husky install server/.husky"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run ts.check && npm run build && npm run "
-    }
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
