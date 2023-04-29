@@ -31,7 +31,7 @@ export default function LoginButton() {
           { withCredentials: true }
         )
         .then((res) => {
-          console.log(res);
+          //console.log(res);
           setLoggedUser(res.data);
         })
         .catch((err) => {
