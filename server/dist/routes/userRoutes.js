@@ -60,10 +60,11 @@ router.get("/artifacts", verifyToken_1.default, (req, res) => __awaiter(void 0, 
 //Logout user route
 ////
 router.get("/logout", (req, res) => {
-    res.cookie("token", null, {
+    res.cookie("token", "", {
         httpOnly: true,
+        maxAge: 0,
         domain: process.env.COOKIE_DOMAIN,
-        expires: new Date(0),
+        sameSite: "lax",
     });
     res.status(200).send("User logged out");
 });
