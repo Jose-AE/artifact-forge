@@ -50,7 +50,7 @@ mongoose_1.default.connect(process.env.DB_URI, {
     dbName: "Main",
 });
 app.get("/", (req, res) => {
-    res.send("Artifact Forge API");
+    res.send("Artifact Forge API 1.0");
 });
 app.listen(PORT, () => {
     console.log("server running in port: " + PORT);

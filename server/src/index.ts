@@ -31,7 +31,7 @@ mongoose.connect(process.env.DB_URI as string, {
 });
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Artifact Forge API");
+  res.send("Artifact Forge API 1.0");
 });
 
 app.listen(PORT, () => {
