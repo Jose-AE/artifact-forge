@@ -93,7 +93,7 @@ router.post("/login", (req: Request, res: Response) => {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24 * 30, // 14 Day Age,
             domain: process.env.COOKIE_DOMAIN,
-            sameSite: "none",
+            sameSite: "lax",
           });
 
           res.status(201).send({ pfp, username });
@@ -118,7 +118,7 @@ router.post("/login", (req: Request, res: Response) => {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24 * 30, // 14 Day Age,
             domain: process.env.COOKIE_DOMAIN,
-            sameSite: "none",
+            sameSite: "lax",
           });
 
           res.status(202).send({ pfp, username });
