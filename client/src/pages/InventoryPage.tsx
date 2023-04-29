@@ -24,6 +24,7 @@ import {
 
 import { BiLockAlt, BiLockOpenAlt, BiTrash } from "react-icons/bi";
 import { HiLockClosed } from "react-icons/hi";
+import { AiFillStar } from "react-icons/ai";
 import ArtifactInfoWindow from "../components/ArtifactInfoWindow";
 
 function Artifact({
@@ -67,6 +68,7 @@ function Artifact({
           {formatedArtifactData.level}
         </Text>
         {thisArtifact.locked ? <HiLockClosed color="#F56565" /> : null}
+        {thisArtifact.showcase ? <AiFillStar color="#F6AD55" /> : null}
       </Flex>
     </Box>
   );

@@ -56,12 +56,14 @@ export default function ArtifactInfoWindow({
   } | null>(null);
 
   const [locked, setLocked] = useState<boolean>(false);
+  const [showcase, setShowcase] = useState<boolean>(false);
 
   //find out why selected artifact is not getting updated
   useEffect(() => {
     if (selectedArtifact) {
       setFormattedArtifactData(artifactFormatter(selectedArtifact) as any);
       setLocked(selectedArtifact.locked);
+      setShowcase(selectedArtifact.showcase);
     }
   }, [selectedArtifact]);
 
@@ -90,9 +92,14 @@ export default function ArtifactInfoWindow({
         <ModalOverlay />
         <ModalContent w="280px">
           <ModalCloseButton />
+
           <Flex p={6} direction="column" alignItems="center">
+            <Box p="7px" borderWidth="1px" borderColor="" borderRadius="5px">
+              <Text as="b">{formattedArtifactData?.level}</Text>
+            </Box>
+
             <Image h="100px" w="100px" src={formattedArtifactData?.image} />
-            <Stack spacing={2} align={"center"} mb={3}>
+            <Stack spacing={3} align={"center"} mb={3}>
               <Heading
                 fontSize={"2xl"}
                 fontWeight={500}
@@ -101,7 +108,9 @@ export default function ArtifactInfoWindow({
               >
                 {formattedArtifactData?.type}
               </Heading>
+
               <Text color={"gray.500"}>{formattedArtifactData?.set}</Text>
+
               <Box
                 p="7px"
                 borderWidth="2px"
@@ -134,57 +143,60 @@ export default function ArtifactInfoWindow({
               ) : null}
             </List>
 
-            <Flex
-              w="230px"
-              mt="20px"
-              align-items="center"
-              justifyContent="space-between"
-            >
-              {/*Level up buttons */}
-              <Button
-                w="50%"
-                isDisabled={selectedArtifact?.artifactData.level === 20}
-                leftIcon={<FiArrowUp />}
-                onClick={() => {
-                  axios
-                    .post(
-                      import.meta.env.VITE_API_URI + "/artifact/level-up",
-                      {
-                        artifactId: selectedArtifact?._id,
-                        levels: 4,
-                      },
-                      { withCredentials: true }
-                    )
-                    .then((res) => {
-                      updateArtifact(res.data);
-                    });
-                }}
-                mr="10px"
+            {selectedArtifact?.artifactData.level !== 20 ? (
+              <Flex
+                w="230px"
+                mt="20px"
+                align-items="center"
+                justifyContent="space-between"
               >
-                +4
-              </Button>
-              <Button
-                w="50%"
-                isDisabled={selectedArtifact?.artifactData.level === 20}
-                leftIcon={<FiArrowUp />}
-                onClick={() => {
-                  axios
-                    .post(
-                      import.meta.env.VITE_API_URI + "/artifact/level-up",
-                      {
-                        artifactId: selectedArtifact?._id,
-                        levels: 20,
-                      },
-                      { withCredentials: true }
-                    )
-                    .then((res) => {
-                      updateArtifact(res.data);
-                    });
-                }}
-              >
-                +20
-              </Button>
-            </Flex>
+                {/*Level up buttons */}
+
+                <Button
+                  w="50%"
+                  isDisabled={selectedArtifact?.artifactData.level === 20}
+                  leftIcon={<FiArrowUp />}
+                  onClick={() => {
+                    axios
+                      .post(
+                        import.meta.env.VITE_API_URI + "/artifact/level-up",
+                        {
+                          artifactId: selectedArtifact?._id,
+                          levels: 4,
+                        },
+                        { withCredentials: true }
+                      )
+                      .then((res) => {
+                        updateArtifact(res.data);
+                      });
+                  }}
+                  mr="10px"
+                >
+                  +4
+                </Button>
+                <Button
+                  w="50%"
+                  isDisabled={selectedArtifact?.artifactData.level === 20}
+                  leftIcon={<FiArrowUp />}
+                  onClick={() => {
+                    axios
+                      .post(
+                        import.meta.env.VITE_API_URI + "/artifact/level-up",
+                        {
+                          artifactId: selectedArtifact?._id,
+                          levels: 20,
+                        },
+                        { withCredentials: true }
+                      )
+                      .then((res) => {
+                        updateArtifact(res.data);
+                      });
+                  }}
+                >
+                  +20
+                </Button>
+              </Flex>
+            ) : null}
 
             <Flex mt="10px">
               {/* Lock button*/}
@@ -192,7 +204,7 @@ export default function ArtifactInfoWindow({
                 onClick={() => {
                   axios
                     .post(
-                      import.meta.env.VITE_API_URI + "/artifact/set-locked",
+                      import.meta.env.VITE_API_URI + "/artifact/switch-lock",
                       {
                         artifactId: selectedArtifact?._id,
                       },
@@ -215,7 +227,11 @@ export default function ArtifactInfoWindow({
               <Tooltip
                 closeOnClick={false}
                 hasArrow
-                label="Phone number, Phone number,Phone number,Phone number"
+                label={
+                  selectedArtifact?.artifactData.level === 20
+                    ? "If enabled artifact will apear in the explore page and people will be able to vote for it"
+                    : "Level artifact to +20 to enable showcase"
+                }
                 fontSize="md"
               >
                 <Flex
@@ -230,8 +246,23 @@ export default function ArtifactInfoWindow({
                     Showcase
                   </Text>
                   <Switch
+                    isChecked={showcase}
+                    onChange={(e) => {
+                      setShowcase(!showcase);
+                      axios
+                        .post(
+                          import.meta.env.VITE_API_URI +
+                            "/artifact/switch-showcase",
+                          {
+                            artifactId: selectedArtifact?._id,
+                          },
+                          { withCredentials: true }
+                        )
+                        .then((res) => {
+                          updateArtifact(res.data);
+                        });
+                    }}
                     pt="2px"
-                    id="showcase"
                     isDisabled={!(selectedArtifact?.artifactData.level === 20)}
                   />
                 </Flex>

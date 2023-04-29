@@ -21,21 +21,28 @@ export default function artifactFormatter(
 
   const artifactData = artifact.artifactData;
 
-  const mainstat = `${
-    ARTIFACT_STAT_NAME_ALIASES[Object.keys(artifactData.mainStat)[0]]
-  } +${Math.round(Object.values(artifactData.mainStat)[0] * 10) / 10}${
-    NOT_PERCENT_STATS.includes(Object.keys(artifactData.mainStat)[0]) ? "" : "%"
-  }`;
+  const mainstat = NOT_PERCENT_STATS.includes(
+    Object.keys(artifactData.mainStat)[0]
+  )
+    ? `${
+        ARTIFACT_STAT_NAME_ALIASES[Object.keys(artifactData.mainStat)[0]]
+      }+${Math.round(Object.values(artifactData.mainStat)[0])}`
+    : `${ARTIFACT_STAT_NAME_ALIASES[Object.keys(artifactData.mainStat)[0]]}+${
+        Math.round(Object.values(artifactData.mainStat)[0] * 10) / 10
+      }%`;
 
   const type = ARTIFACT_TYPE_NAME_ALIASES[artifactData.type] as string;
 
   const set = ARTIFACT_SET_NAME_ALIASES[artifactData.set] as string;
 
-  const substats = Object.keys(artifactData.subStats).map(
-    (statName) =>
-      `${ARTIFACT_STAT_NAME_ALIASES[statName]}+${
-        Math.round(artifactData.subStats[statName] * 10) / 10
-      }${NOT_PERCENT_STATS.includes(statName) ? "" : "%"}`
+  const substats = Object.keys(artifactData.subStats).map((statName) =>
+    NOT_PERCENT_STATS.includes(statName)
+      ? `${ARTIFACT_STAT_NAME_ALIASES[statName]}+${Math.round(
+          artifactData.subStats[statName]
+        )}`
+      : `${ARTIFACT_STAT_NAME_ALIASES[statName]}+${
+          Math.round(artifactData.subStats[statName] * 10) / 10
+        }%`
   );
 
   const level = `+${artifactData.level}`;

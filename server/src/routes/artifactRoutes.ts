@@ -65,43 +65,58 @@ router.post("/level-up", async (req: AuthenticatedRequest, res: Response) => {
   }
 });
 
-router.post("/set-locked", async (req: AuthenticatedRequest, res: Response) => {
-  const { artifactId } = req.body;
-
-  if (typeof artifactId === "string") {
-    try {
-      if (await checkArtifactOwnership(artifactId, req.userId as string)) {
-        const artifact = await Artifact.findById(artifactId);
-        const updatedArtifact = await Artifact.findByIdAndUpdate(
-          artifactId,
-          {
-            locked: !artifact.locked,
-          },
-          { new: true }
-        );
-        res.status(202).send(updatedArtifact);
-      } else {
-        res.status(403).send("User does not own artifact");
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Invalid artifact id");
-    }
-  } else {
-    res.status(500).send("Invalid request body ");
-  }
-});
-
 router.post(
-  "/set-showcase",
+  "/switch-lock",
   async (req: AuthenticatedRequest, res: Response) => {
-    const { artifactId, showcase } = req.body;
+    const { artifactId } = req.body;
 
-    if (typeof artifactId == "string" && typeof showcase == "boolean") {
+    if (typeof artifactId === "string") {
       try {
         if (await checkArtifactOwnership(artifactId, req.userId as string)) {
-          await Artifact.findByIdAndUpdate(artifactId, { showcase });
-          res.status(202).send("Artifact set/unset for showcase");
+          const artifact = await Artifact.findById(artifactId);
+          const updatedArtifact = await Artifact.findByIdAndUpdate(
+            artifactId,
+            {
+              locked: !artifact.locked,
+            },
+            { new: true }
+          );
+          res.status(202).send(updatedArtifact);
+        } else {
+          res.status(403).send("User does not own artifact");
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(500).send("Invalid artifact id");
+      }
+    } else {
+      res.status(500).send("Invalid request body ");
+    }
+  }
+);
+
+router.post(
+  "/switch-showcase",
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { artifactId } = req.body;
+
+    if (typeof artifactId == "string") {
+      try {
+        if (await checkArtifactOwnership(artifactId, req.userId as string)) {
+          const artifact = await Artifact.findById(artifactId);
+
+          if (artifact.artifactData.level === 20) {
+            const updatedArtifact = await Artifact.findByIdAndUpdate(
+              artifactId,
+              {
+                showcase: !artifact.showcase,
+              },
+              { new: true }
+            );
+            res.status(202).send(updatedArtifact);
+          } else {
+            res.status(500).send("Artifact is not level 20");
+          }
         } else {
           res.status(403).send("User does not own artifact");
         }
