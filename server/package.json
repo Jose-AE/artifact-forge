@@ -36,6 +36,7 @@
     "@types/jsonwebtoken": "^9.0.1",
     "pre-commit": "^1.2.2",
     "rimraf": "^5.0.0",
-    "tsx": "^3.12.6"
+    "tsx": "^3.12.6",
+    "typescript": "^5.0.4"
   }
 }
