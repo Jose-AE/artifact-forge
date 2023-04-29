@@ -7,9 +7,11 @@
     "dev": "tsx watch src/index.ts",
     "build": "rimraf dist && tsc",
     "ts.check": "tsc --project tsconfig.json",
-    "add-build": "git add dist"
+    "add-build": "git add dist",
+    "test": "echo. > test.txt"
   },
   "pre-commit": [
+    "test",
     "ts.check",
     "build",
     "add-build"
