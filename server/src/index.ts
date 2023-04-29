@@ -1,9 +1,10 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import mongoose, { Mongoose } from "mongoose";
 import verifyToken from "./middleware/verifyToken";
 import cookieParser from "cookie-parser";
 import * as dotenv from "dotenv";
+
 dotenv.config();
 
 const app = express();
@@ -27,6 +28,10 @@ const PORT = process.env.PORT || 3000;
 
 mongoose.connect(process.env.DB_URI as string, {
   dbName: "Main",
+});
+
+app.get("/", (req: Request, res: Response) => {
+  res.send("Artifact Forge API");
 });
 
 app.listen(PORT, () => {
