@@ -4,10 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
     "dev": "tsx watch src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rimraf dist && tsc",
+    "ts.check": "tsc --project tsconfig.json",
+    "add-build": "git add dist"
   },
+  "pre-commit": [
+    "ts.check",
+    "build",
+    "add-build"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -20,6 +26,8 @@
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.0.3",
+    "pre-commit": "^1.2.2",
+    "rimraf": "^5.0.0",
     "tsc": "^2.0.4"
   },
   "devDependencies": {
