@@ -9,6 +9,8 @@ export default function SettingsPage() {
     <>
       <Text>{loggedUser?.username}</Text>
       <Avatar src={loggedUser?.pfp} />
+      <Text>client id {import.meta.env.VITE_GOOGLE_CLIENT_ID}</Text>
+      <Text>api url {import.meta.env.VITE_API_URI}</Text>
     </>
   );
 }
