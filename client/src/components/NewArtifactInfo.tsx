@@ -115,7 +115,7 @@ export default function NewArtifactInfo({
                 onClick={() => {
                   axios
                     .post(
-                      import.meta.env.VITE_API_URI + "/artifact/set-locked",
+                      import.meta.env.VITE_API_URI + "/artifact/switch-lock",
                       {
                         artifactId: generatedArtifact?._id,
                       },

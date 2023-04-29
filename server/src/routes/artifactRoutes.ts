@@ -22,15 +22,20 @@ router.post("/generate", async (req: Request | any, res: Response) => {
 
   if (typeof domain == "number") {
     try {
-      const createdArtifact = await Artifact.create({
-        owner: req.userId,
-        locked: false,
-        artifactData: generateArtifact(domain),
-        showcase: false,
-        voters: [],
-        votes: 0,
-      });
-      res.status(201).send(createdArtifact);
+      const userArtifacts = await Artifact.find({ owner: req.userId });
+      if (userArtifacts.length < 500) {
+        const createdArtifact = await Artifact.create({
+          owner: req.userId,
+          locked: false,
+          artifactData: generateArtifact(domain),
+          showcase: false,
+          voters: [],
+          votes: 0,
+        });
+        res.status(201).send(createdArtifact);
+      } else {
+        res.status(409).send("Inventory full");
+      }
     } catch (error) {
       console.error(error);
       res.status(500).send("Server Error");

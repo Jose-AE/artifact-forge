@@ -189,7 +189,10 @@ export default function InventoryPage() {
         selectedArtifact={selectedArtifact}
       />
       <Searchbar setSetFilter={setSetFilter} setStatFilter={setStatFilter} />
-      <Box h={`calc(100vh - ${190}px)`} overflowY="auto" mt="10px">
+      <Text textAlign="center" fontWeight="semibold" ml="3px" mt="3px">
+        {userArtifacts.length}/500
+      </Text>
+      <Box h={`calc(100vh - ${220}px)`} overflowY="auto" mt="10px">
         <Grid
           autoRows="auto"
           templateColumns={{

@@ -1,4 +1,4 @@
-import { Button, SimpleGrid, useDisclosure } from "@chakra-ui/react";
+import { Button, SimpleGrid, useDisclosure, useToast } from "@chakra-ui/react";
 
 import Domain from "../components/Domain";
 import NewArtifactInfo from "../components/NewArtifactInfo";
@@ -8,6 +8,8 @@ import { ArtifactType } from "../types/artifactType";
 import axios from "axios";
 
 export default function GeneratePage() {
+  const toast = useToast();
+
   const {
     isOpen: isOpenNewArifactModal,
     onOpen: onOpenNewArifactModal,
@@ -36,7 +38,25 @@ export default function GeneratePage() {
         onOpenNewArifactModal();
       })
       .catch((err) => {
-        console.log(err);
+        if (err.response.status === 409) {
+          toast.closeAll();
+          toast({
+            title: "Inventory full",
+            description: "Delete some artifacts to generate more",
+            status: "error",
+            duration: 2000,
+            isClosable: false,
+          });
+        } else {
+          toast.closeAll();
+          toast({
+            title: "An error occured",
+            description: "We've created your account for you.",
+            status: "error",
+            duration: 2000,
+            isClosable: false,
+          });
+        }
       });
   }
 
