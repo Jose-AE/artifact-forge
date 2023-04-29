@@ -60,7 +60,7 @@ router.get("/artifacts", verifyToken_1.default, (req, res) => __awaiter(void 0, 
 //Logout user route
 ////
 router.get("/logout", (req, res) => {
-    res.clearCookie("token", {
+    res.cookie("token", null, {
         httpOnly: true,
         domain: process.env.COOKIE_DOMAIN,
         expires: new Date(0),
