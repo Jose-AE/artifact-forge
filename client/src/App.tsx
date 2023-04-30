@@ -14,6 +14,11 @@ interface UserInterface {
 }
 
 function App() {
+  //if new user
+  if (!localStorage.getItem("userIsLoggedIn")) {
+    localStorage.setItem("loggedUser", "false");
+  }
+
   /* useEffect(() => {
     //fetch logged user
     axios
