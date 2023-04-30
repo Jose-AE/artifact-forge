@@ -1,8 +1,9 @@
-import { Button } from "@chakra-ui/react";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { useContext } from "react";
 import { LoginContext } from "../App";
+import { FcGoogle } from "react-icons/fc";
+import { Button, Center, Text } from "@chakra-ui/react";
 
 export default function LoginButton() {
   const { loggedUser, setLoggedUser } = useContext(LoginContext);
@@ -35,7 +36,7 @@ export default function LoginButton() {
           { withCredentials: true }
         )
         .then((res) => {
-          //console.log(res);
+          console.log(res.data);
           setLoggedUser(res.data);
         })
         .catch((err) => {
@@ -46,11 +47,14 @@ export default function LoginButton() {
 
   return (
     <>
-      {loggedUser ? (
-        <Button onClick={logout}>Logout</Button>
-      ) : (
-        <Button onClick={() => login()}>Sign in with Google</Button>
-      )}
+      <Center>
+        <Button onClick={() => login()} w="100%" leftIcon={<FcGoogle />}>
+          <Center>
+            <Text>Sign in with Google</Text>
+          </Center>
+        </Button>
+        <Button onClick={logout}>logout</Button>
+      </Center>
     </>
   );
 }

@@ -11,8 +11,8 @@ import {
   CloseButton,
 } from "@chakra-ui/react";
 
-import Domain from "../components/Domain";
-import NewArtifactInfo from "../components/NewArtifactInfo";
+import { Navigate } from "react-router-dom";
+
 import { useState, useRef, useEffect, SetStateAction, Dispatch } from "react";
 import { ArtifactType } from "../types/artifactType";
 import axios from "axios";
@@ -22,10 +22,12 @@ import {
   ARTIFACT_STAT_NAME_ALIASES,
 } from "../data/nameAliasesData";
 
-import { BiLockAlt, BiLockOpenAlt, BiTrash } from "react-icons/bi";
 import { HiLockClosed } from "react-icons/hi";
 import { AiFillStar } from "react-icons/ai";
 import ArtifactInfoWindow from "../components/ArtifactInfoWindow";
+
+import { useContext } from "react";
+import { LoginContext } from "../App";
 
 function Artifact({
   thisArtifact,

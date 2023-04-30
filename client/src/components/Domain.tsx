@@ -7,9 +7,9 @@ import {
   Heading,
   Stack,
 } from "@chakra-ui/react";
-import axios from "axios";
-import { ArtifactType } from "../types/artifactType";
-import { Dispatch } from "react";
+import { useContext } from "react";
+import { LoginContext } from "../App";
+import { Navigate } from "react-router-dom";
 
 interface DomainProps {
   name: string;

@@ -47,6 +47,7 @@ const LinkItems: Array<LinkItemProps> = [
   { name: "Inventory", icon: BiCategory, location: "/inventory" },
   { name: "Explore", icon: BiCompass, location: "/explore" },
   { name: "Settings", icon: BiCog, location: "/settings" },
+  { name: "Login", icon: BiCog, location: "/login" },
 ];
 
 export default function Sidebar({ children }: { children: ReactNode }) {
@@ -105,7 +106,6 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           {link.name}
         </NavItem>
       ))}
-      <LoginButton />
     </Box>
   );
 };
