@@ -6,6 +6,7 @@ import InventoryPage from "./pages/InventoryPage";
 import SettingsPage from "./pages/SettingsPage";
 import axios from "axios";
 import ExplorePage from "./pages/ExplorePage";
+import { Analytics } from "@vercel/analytics/react";
 
 export const LoginContext = createContext<any>(null);
 
@@ -33,6 +34,7 @@ function App() {
 
   return (
     <>
+      <Analytics />
       <LoginContext.Provider value={{ loggedUser, setLoggedUser }}>
         <Sidebar>
           <Routes>
