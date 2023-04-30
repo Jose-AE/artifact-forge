@@ -6,8 +6,14 @@ import { DOMAINS } from "../data/domainsData";
 import { useState, useRef } from "react";
 import { ArtifactType } from "../types/artifactType";
 import axios from "axios";
+import { Navigate } from "react-router-dom";
 
 export default function GeneratePage() {
+  //check if user lis logged in
+  if (localStorage.getItem("userIsLoggedIn") == "false") {
+    return <Navigate to="/login" />;
+  }
+
   const toast = useToast();
 
   const {

@@ -9,6 +9,8 @@ import {
   Flex,
   Grid,
   CloseButton,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
 
 import { Navigate } from "react-router-dom";
@@ -25,9 +27,6 @@ import {
 import { HiLockClosed } from "react-icons/hi";
 import { AiFillStar } from "react-icons/ai";
 import ArtifactInfoWindow from "../components/ArtifactInfoWindow";
-
-import { useContext } from "react";
-import { LoginContext } from "../App";
 
 function Artifact({
   thisArtifact,
@@ -116,6 +115,12 @@ function Searchbar({
 }
 
 export default function InventoryPage() {
+  //check if user lis logged in
+  if (localStorage.getItem("userIsLoggedIn") == "false") {
+    return <Navigate to="/login" />;
+  }
+
+  const [loadingArtifacts, setLoadingArtifacts] = useState<boolean>(false);
   const [selectedArtifact, setSelectedArtifact] = useState<ArtifactType | null>(
     null
   );
@@ -130,12 +135,14 @@ export default function InventoryPage() {
   } = useDisclosure();
 
   useEffect(() => {
+    setLoadingArtifacts(true);
     axios
       .get(import.meta.env.VITE_API_URI + "/user/artifacts", {
         withCredentials: true,
       })
       .then((res) => {
         setUserArtifacts(res.data);
+        setLoadingArtifacts(false);
       })
       .catch((err) => {
         console.log(err);
@@ -191,33 +198,42 @@ export default function InventoryPage() {
         selectedArtifact={selectedArtifact}
       />
       <Searchbar setSetFilter={setSetFilter} setStatFilter={setStatFilter} />
-      <Text textAlign="center" fontWeight="semibold" ml="3px" mt="3px">
-        {userArtifacts.length}/500
-      </Text>
-      <Box h={`calc(100vh - ${220}px)`} overflowY="auto" mt="10px">
-        <Grid
-          autoRows="auto"
-          templateColumns={{
-            base: "repeat(4, minmax(0, 1fr))",
-            sm: "repeat(6, minmax(0, 1fr))",
-            md: "repeat(8, minmax(0, 1fr))",
-            lg: "repeat(12, minmax(0, 1fr))",
-            "2xl": "repeat(17, minmax(0, 1fr))",
-          }}
-          gap={3}
-        >
-          {filterAndSortArtifacts().map((artifact, i) => {
-            return (
-              <Artifact
-                key={i}
-                setSelectedArtifact={setSelectedArtifact}
-                thisArtifact={artifact}
-                onOpen={onOpenArifactInfoModal}
-              />
-            );
-          })}
-        </Grid>
-      </Box>
+
+      {loadingArtifacts ? (
+        <Center h={`calc(100vh - ${220}px)`}>
+          <Spinner color="whiteAlpha.300" thickness="10px" boxSize={100} />
+        </Center>
+      ) : (
+        <>
+          <Text textAlign="center" fontWeight="semibold" ml="3px" mt="3px">
+            {userArtifacts.length}/500
+          </Text>
+          <Box h={`calc(100vh - ${220}px)`} overflowY="auto" mt="10px">
+            <Grid
+              autoRows="auto"
+              templateColumns={{
+                base: "repeat(4, minmax(0, 1fr))",
+                sm: "repeat(6, minmax(0, 1fr))",
+                md: "repeat(8, minmax(0, 1fr))",
+                lg: "repeat(12, minmax(0, 1fr))",
+                "2xl": "repeat(17, minmax(0, 1fr))",
+              }}
+              gap={3}
+            >
+              {filterAndSortArtifacts().map((artifact, i) => {
+                return (
+                  <Artifact
+                    key={i}
+                    setSelectedArtifact={setSelectedArtifact}
+                    thisArtifact={artifact}
+                    onOpen={onOpenArifactInfoModal}
+                  />
+                );
+              })}
+            </Grid>
+          </Box>
+        </>
+      )}
     </>
   );
 }

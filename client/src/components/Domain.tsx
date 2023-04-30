@@ -7,8 +7,6 @@ import {
   Heading,
   Stack,
 } from "@chakra-ui/react";
-import { useContext } from "react";
-import { LoginContext } from "../App";
 import { Navigate } from "react-router-dom";
 
 interface DomainProps {

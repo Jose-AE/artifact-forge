@@ -16,13 +16,14 @@ import {
   List,
   Image,
   ListItem,
+  Center,
   ListIcon,
 } from "@chakra-ui/react";
-import LoginButton from "../components/LoginButton";
 import { BiRadioCircleMarked } from "react-icons/bi";
-import { LoginContext } from "../App";
-import { useContext } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
+import { FcGoogle } from "react-icons/fc";
 
 const showcaseArtifacts = [
   {
@@ -128,15 +129,50 @@ function Artifact({
   );
 }
 
+function LoginButton() {
+  const navigate = useNavigate();
+
+  const login = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      axios
+        .post(
+          import.meta.env.VITE_API_URI + "/user/login",
+          {
+            googleAccessToken: tokenResponse.access_token,
+          },
+          { withCredentials: true }
+        )
+        .then((res) => {
+          localStorage.setItem("userIsLoggedIn", "true");
+          navigate("/");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+  });
+
+  return (
+    <>
+      <Center>
+        <Button onClick={() => login()} w="100%" leftIcon={<FcGoogle />}>
+          <Center>
+            <Text>Sign in with Google</Text>
+          </Center>
+        </Button>
+      </Center>
+    </>
+  );
+}
+
 export default function LoginPage() {
-  const { loggedUser } = useContext(LoginContext);
-  if (loggedUser) {
-    //return <Navigate to="/" />;
+  //check if user lis logged in
+  if (localStorage.getItem("userIsLoggedIn") == "true") {
+    return <Navigate to="/" />;
   }
 
   return (
     <>
-      {loggedUser?.username}
       <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
         <Stack align={"center"}>
           <Heading textAlign="center" fontSize={"4xl"}>

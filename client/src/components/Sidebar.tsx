@@ -13,29 +13,24 @@ import {
   useDisclosure,
   BoxProps,
   FlexProps,
+  Button,
 } from "@chakra-ui/react";
-import {
-  FiHome,
-  FiTrendingUp,
-  FiCompass,
-  FiStar,
-  FiSettings,
-  FiMenu,
-  FiArchive,
-  FiBox,
-  FiLock,
-} from "react-icons/fi";
+import { FiMenu } from "react-icons/fi";
+import { BsInfoCircle } from "react-icons/bs";
 import {
   BiCustomize,
   BiCategory,
   BiPlusCircle,
   BiCompass,
   BiCog,
+  BiInfoCircle,
+  BiLogOut,
 } from "react-icons/bi";
 
 import { IconType } from "react-icons";
 import { ReactText } from "react";
-import LoginButton from "./LoginButton";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface LinkItemProps {
   name: string;
@@ -43,11 +38,10 @@ interface LinkItemProps {
   location: string;
 }
 const LinkItems: Array<LinkItemProps> = [
-  { name: "Generate", icon: BiPlusCircle, location: "/generate" },
+  { name: "Generate", icon: BiPlusCircle, location: "/" },
   { name: "Inventory", icon: BiCategory, location: "/inventory" },
   { name: "Explore", icon: BiCompass, location: "/explore" },
-  { name: "Settings", icon: BiCog, location: "/settings" },
-  { name: "Login", icon: BiCog, location: "/login" },
+  { name: "About", icon: BiInfoCircle, location: "/settings" },
 ];
 
 export default function Sidebar({ children }: { children: ReactNode }) {
@@ -85,6 +79,8 @@ interface SidebarProps extends BoxProps {
 }
 
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
+  const navigate = useNavigate();
+
   return (
     <Box
       bg={useColorModeValue("white", "gray.900")}
@@ -106,6 +102,49 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           {link.name}
         </NavItem>
       ))}
+
+      {/*logout button*/}
+      {localStorage.getItem("userIsLoggedIn") === "true" ? (
+        <Flex
+          align="center"
+          p="4"
+          mx="4"
+          borderRadius="lg"
+          role="group"
+          cursor="pointer"
+          _hover={{
+            bg: "gray.700",
+            color: "white",
+          }}
+          onClick={() => {
+            axios
+              .post(
+                import.meta.env.VITE_API_URI + "/user/logout",
+                {},
+                {
+                  withCredentials: true,
+                }
+              )
+              .then((res) => {
+                localStorage.setItem("userIsLoggedIn", "false");
+                navigate("/login");
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          }}
+        >
+          <Icon
+            mr="4"
+            fontSize="16"
+            _groupHover={{
+              color: "white",
+            }}
+            as={BiLogOut}
+          />
+          Log out
+        </Flex>
+      ) : null}
     </Box>
   );
 };
