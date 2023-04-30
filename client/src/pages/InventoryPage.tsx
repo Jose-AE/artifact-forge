@@ -116,7 +116,8 @@ function Searchbar({
 
 export default function InventoryPage() {
   //check if user lis logged in
-  if (localStorage.getItem("userIsLoggedIn") == "false") {
+  if (localStorage.getItem("userIsLoggedIn") === "false") {
+    console.log("d");
     return <Navigate to="/login" />;
   }
 

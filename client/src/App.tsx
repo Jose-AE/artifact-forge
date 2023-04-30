@@ -16,7 +16,7 @@ interface UserInterface {
 function App() {
   //if new user
   if (!localStorage.getItem("userIsLoggedIn")) {
-    localStorage.setItem("loggedUser", "false");
+    localStorage.setItem("userIsLoggedIn", "false");
   }
 
   /* useEffect(() => {
