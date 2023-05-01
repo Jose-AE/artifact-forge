@@ -68,7 +68,9 @@ export default function NewArtifactInfo({
               >
                 {artifactData?.type}
               </Heading>
-              <Text color={"gray.500"}>{artifactData?.set}</Text>
+              <Text textAlign="center" color={"gray.500"}>
+                {artifactData?.set}
+              </Text>
               <Box
                 p="7px"
                 borderWidth="2px"

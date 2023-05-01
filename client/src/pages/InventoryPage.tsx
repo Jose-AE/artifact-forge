@@ -37,7 +37,7 @@ function Artifact({
   onOpen(): void;
   setSelectedArtifact: Dispatch<SetStateAction<ArtifactType | null>>;
 }) {
-  const formatedArtifactData = artifactFormatter(thisArtifact);
+  const formattedArtifactData = artifactFormatter(thisArtifact);
 
   return (
     <Box
@@ -50,7 +50,7 @@ function Artifact({
       bg="gray.700"
       _hover={{ bg: "gray.600", cursor: "pointer" }}
     >
-      <Image src={formatedArtifactData.image} />
+      <Image src={formattedArtifactData.image} />
 
       <Flex
         visibility={thisArtifact.locked ? "visible" : "hidden"}
@@ -66,7 +66,7 @@ function Artifact({
         alignItems="center"
       >
         <Text as="b" textAlign="center" mr="3px">
-          {formatedArtifactData.level}
+          {formattedArtifactData.level}
         </Text>
         {thisArtifact.locked ? <HiLockClosed color="#F56565" /> : null}
         {thisArtifact.showcase ? <AiFillStar color="#F6AD55" /> : null}
@@ -117,7 +117,6 @@ function Searchbar({
 export default function InventoryPage() {
   //check if user lis logged in
   if (localStorage.getItem("userIsLoggedIn") === "false") {
-    console.log("d");
     return <Navigate to="/login" />;
   }
 
