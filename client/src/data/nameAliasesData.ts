@@ -23,6 +23,8 @@ export const ARTIFACT_SET_NAME_ALIASES: { [key: string]: String } = {
   echoes_of_an_offering: "Echoes of an Offering",
   deepwood_memories: "Deepwood Memories",
   gilded_dreams: "Gilded Dreams",
+  desert_pavilion_chronicle: "Desert Pavilion Chronicle",
+  flower_of_paradise_lost: "Flower of Paradise Lost",
   nymphs_dream: "Nymph's Dream",
   vourukashas_glow: "Vourukasha's Glow",
 };
