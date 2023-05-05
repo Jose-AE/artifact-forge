@@ -101,10 +101,9 @@ export default function AboutPage() {
                   page.
                   <br />
                   <br />
-                  <br />
-                  Every image related to "Genshin Impact" is intellectual
-                  property of miHoYo Co Ltd. This website does not own any of
-                  them. All data and images were taken from{" "}
+                  This project is not affiliated with HoYoVerse. Genshin Impact,
+                  game content and materials are trademarks and copyrights of
+                  HoYoVerse. All data and images were taken from{" "}
                   <a
                     href="https://genshin-impact.fandom.com/wiki/Genshin_Impact_Wiki"
                     target="external"
@@ -112,6 +111,26 @@ export default function AboutPage() {
                   >
                     Genshin Impact Wiki
                   </a>
+                </Text>
+              </Box>
+
+              <Box>
+                <Text
+                  fontFamily={"heading"}
+                  fontSize={"3xl"}
+                  color={"white"}
+                  mb={3}
+                >
+                  Privacy Policy
+                </Text>
+
+                <Text fontSize={"xl"} color={"gray.400"}>
+                  Artifact forge uses Vercel Analytics to automatically collect
+                  certain information about your device and browsing activity.
+                  This information includes: Browser type and version, Operating
+                  system, Device type and Country This information is used to
+                  analyze user behavior and improve the functionality of the
+                  website.
                 </Text>
               </Box>
             </SimpleGrid>
