@@ -321,7 +321,7 @@ export default function ExplorePage() {
           <Heading p="10px" mb={5}>
             Vote for Artifacts
           </Heading>
-          <SimpleGrid gap={5} columns={1} minChildWidth="350px">
+          <SimpleGrid gap={5} columns={1} minChildWidth="200px">
             {forVoteArtifacts.length === 0 ? (
               <Center h="300px" bg="gray.700" borderRadius="5px">
                 <Text textAlign="center">
