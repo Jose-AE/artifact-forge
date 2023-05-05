@@ -134,13 +134,11 @@ router.post("/vote", (req, res) => __awaiter(void 0, void 0, void 0, function* (
     if (typeof artifactId == "string" && (vote === "up" || vote === "down")) {
         try {
             if (!(yield checkArtifactOwnership(artifactId, req.userId))) {
-                const test = yield artifactModel_1.default.findOneAndUpdate({ _id: artifactId, voters: { $ne: req.userId } }, // find the artifact by its ID and make sure the user is not already in the voters array
+                yield artifactModel_1.default.findOneAndUpdate({ _id: artifactId, voters: { $ne: req.userId } }, // find the artifact by its ID and make sure the user is not already in the voters array
                 {
                     $push: { voters: req.userId },
                     $inc: { votes: vote === "up" ? 1 : -1 },
-                }, { new: true });
-                console.log(yield artifactModel_1.default.findById(artifactId));
-                console.log(test);
+                });
                 res.status(202).send("voted for Artifact");
             }
             else {

@@ -144,18 +144,13 @@ router.post("/vote", async (req: Request | any, res: Response) => {
   if (typeof artifactId == "string" && (vote === "up" || vote === "down")) {
     try {
       if (!(await checkArtifactOwnership(artifactId, req.userId as string))) {
-        const test = await Artifact.findOneAndUpdate(
+        await Artifact.findOneAndUpdate(
           { _id: artifactId, voters: { $ne: req.userId } }, // find the artifact by its ID and make sure the user is not already in the voters array
           {
             $push: { voters: req.userId },
             $inc: { votes: vote === "up" ? 1 : -1 },
-          },
-          { new: true }
+          }
         );
-
-        console.log(await Artifact.findById(artifactId));
-
-        console.log(test);
 
         res.status(202).send("voted for Artifact");
       } else {
