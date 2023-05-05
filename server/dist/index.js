@@ -32,6 +32,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const verifyToken_1 = __importDefault(require("./middleware/verifyToken"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const dotenv = __importStar(require("dotenv"));
+const express_rate_limit_1 = require("express-rate-limit");
 dotenv.config();
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
@@ -40,6 +41,12 @@ app.use((0, cors_1.default)({
     credentials: true,
 }));
 app.use((0, cookie_parser_1.default)());
+//req limit
+const limiter = (0, express_rate_limit_1.rateLimit)({
+    windowMs: 1000 * 60 * 15,
+    max: 10000, //max of 10,000 req every 15 min
+});
+app.use(limiter);
 //routes
 const artifactRoutes_1 = __importDefault(require("./routes/artifactRoutes"));
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));

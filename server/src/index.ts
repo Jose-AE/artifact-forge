@@ -4,6 +4,7 @@ import mongoose, { Mongoose } from "mongoose";
 import verifyToken from "./middleware/verifyToken";
 import cookieParser from "cookie-parser";
 import * as dotenv from "dotenv";
+import { rateLimit } from "express-rate-limit";
 
 dotenv.config();
 
@@ -16,6 +17,14 @@ app.use(
   })
 );
 app.use(cookieParser());
+
+//req limit
+const limiter = rateLimit({
+  windowMs: 1000 * 60 * 15, //15 min
+  max: 10000, //max of 10,000 req every 15 min
+});
+
+app.use(limiter);
 
 //routes
 import artifactRoutes from "./routes/artifactRoutes";
