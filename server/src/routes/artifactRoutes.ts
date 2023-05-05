@@ -2,6 +2,8 @@ import express, { Request, Response } from "express";
 import generateArtifact from "../utils/generateArtifact";
 import { levelUpArtifact } from "../utils/levelUpArtifact";
 import Artifact from "../models/artifactModel";
+import User from "../models/userModel";
+import mongoose from "mongoose";
 
 const router = express.Router();
 
@@ -14,7 +16,8 @@ async function checkArtifactOwnership(
   userId: String
 ): Promise<Boolean> {
   const artifact = await Artifact.findById(artifactId);
-  return artifact.owner === userId;
+
+  return artifact.owner._id.toString() === userId;
 }
 
 router.post("/generate", async (req: Request | any, res: Response) => {
@@ -135,35 +138,36 @@ router.post(
   }
 );
 
-router.post("/vote", async (req: AuthenticatedRequest, res: Response) => {
-  const { vote, artifactId } = req.body;
+router.post("/vote", async (req: Request | any, res: Response) => {
+  const { artifactId, vote } = req.body;
 
-  if (typeof vote == "string" && typeof artifactId == "string") {
+  if (typeof artifactId == "string" && (vote === "up" || vote === "down")) {
     try {
-      const artifact = await Artifact.findById(artifactId);
-      if (artifact.voters.includes(req.userId)) {
-        // User has already voted
-        res.status(400).send("User has already voted for this artifact");
-      } else {
-        //user has not voted
-        await Artifact.updateOne(
-          { _id: artifactId },
+      if (!(await checkArtifactOwnership(artifactId, req.userId as string))) {
+        const test = await Artifact.findOneAndUpdate(
+          { _id: artifactId, voters: { $ne: req.userId } }, // find the artifact by its ID and make sure the user is not already in the voters array
           {
-            $inc: { votes: vote === "up" ? 1 : -1 },
             $push: { voters: req.userId },
-          }
+            $inc: { votes: vote === "up" ? 1 : -1 },
+          },
+          { new: true }
         );
-        res.status(202).send("Vote successful");
+
+        console.log(await Artifact.findById(artifactId));
+
+        console.log(test);
+
+        res.status(202).send("voted for Artifact");
+      } else {
+        res.status(403).send("Cant vote for your own artifact");
       }
     } catch (error) {
-      console.error(error);
       res.status(500).send("Invalid artifact id");
     }
   } else {
     res.status(500).send("Invalid request body ");
   }
 });
-
 router.post("/delete", async (req: Request | any, res: Response) => {
   const { artifactId } = req.body;
 
@@ -183,6 +187,50 @@ router.post("/delete", async (req: Request | any, res: Response) => {
     }
   } else {
     res.status(500).send("Invalid request body ");
+  }
+});
+
+//get showcase artifacts
+router.get("/showcase-artifacts", async (req: Request | any, res: Response) => {
+  try {
+    const artifacts = await Artifact.find({ showcase: true })
+      .sort({ votes: -1 }) // sort in descending order based on "votes"
+      .limit(49)
+      .populate("owner");
+
+    res.status(200).send(artifacts);
+  } catch (error) {
+    res.status(500).send("Error getting artifacts");
+  }
+});
+
+router.get("/for-vote", async (req: Request | any, res: Response) => {
+  try {
+    let randomArtifacts = await Artifact.aggregate([
+      {
+        $match: {
+          showcase: true,
+          owner: { $ne: new mongoose.Types.ObjectId(req.userId) },
+          voters: { $ne: req.userId },
+        },
+      },
+
+      {
+        $sample: { size: req.query.num ? Math.abs(Number(req.query.num)) : 1 },
+      },
+    ]);
+
+    randomArtifacts = randomArtifacts.filter(
+      (obj: any, index: number) =>
+        randomArtifacts.findIndex((item: any) => item._id === obj._id) === index
+    );
+
+    await User.populate(randomArtifacts, { path: "owner" });
+
+    res.status(200).send(randomArtifacts);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Error getting artifacts");
   }
 });
 

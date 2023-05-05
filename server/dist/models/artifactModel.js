@@ -2,11 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose = require("mongoose");
 const artifactSchema = mongoose.Schema({
-    owner: { type: String, required: true },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    },
     locked: { type: Boolean, required: true },
     showcase: { type: Boolean, required: true },
     artifactData: { type: Object, required: true },
-    voters: [{ type: mongoose.Schema.Types.ObjectId }],
+    voters: { type: (Array) },
     votes: { type: Number, default: 0 },
 });
 exports.default = mongoose.model("Artifact", artifactSchema);

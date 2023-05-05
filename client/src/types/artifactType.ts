@@ -1,6 +1,6 @@
 export interface ArtifactType {
   locked: boolean;
-  owner: string;
+  owner: { username: string; pfp: string };
   showcase: boolean;
   voters: [string];
   votes: number;

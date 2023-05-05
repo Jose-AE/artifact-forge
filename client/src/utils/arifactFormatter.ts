@@ -17,6 +17,17 @@ interface ArifactFormattedData {
 export default function artifactFormatter(
   artifact: ArtifactType
 ): ArifactFormattedData {
+  if (!artifact) {
+    return {
+      image: "NA",
+      mainstat: "NA",
+      type: "NA",
+      set: "NA",
+      substats: ["NA", "NA", "NA", "NA"],
+      level: "NA",
+    };
+  }
+
   const NOT_PERCENT_STATS = ["EM", "HP", "DEF", "ATK"];
 
   const artifactData = artifact.artifactData;

@@ -16,11 +16,13 @@ const express_1 = __importDefault(require("express"));
 const generateArtifact_1 = __importDefault(require("../utils/generateArtifact"));
 const levelUpArtifact_1 = require("../utils/levelUpArtifact");
 const artifactModel_1 = __importDefault(require("../models/artifactModel"));
+const userModel_1 = __importDefault(require("../models/userModel"));
+const mongoose_1 = __importDefault(require("mongoose"));
 const router = express_1.default.Router();
 function checkArtifactOwnership(artifactId, userId) {
     return __awaiter(this, void 0, void 0, function* () {
         const artifact = yield artifactModel_1.default.findById(artifactId);
-        return artifact.owner === userId;
+        return artifact.owner._id.toString() === userId;
     });
 }
 router.post("/generate", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -128,25 +130,24 @@ router.post("/switch-showcase", (req, res) => __awaiter(void 0, void 0, void 0, 
     }
 }));
 router.post("/vote", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { vote, artifactId } = req.body;
-    if (typeof vote == "string" && typeof artifactId == "string") {
+    const { artifactId, vote } = req.body;
+    if (typeof artifactId == "string" && (vote === "up" || vote === "down")) {
         try {
-            const artifact = yield artifactModel_1.default.findById(artifactId);
-            if (artifact.voters.includes(req.userId)) {
-                // User has already voted
-                res.status(400).send("User has already voted for this artifact");
+            if (!(yield checkArtifactOwnership(artifactId, req.userId))) {
+                const test = yield artifactModel_1.default.findOneAndUpdate({ _id: artifactId, voters: { $ne: req.userId } }, // find the artifact by its ID and make sure the user is not already in the voters array
+                {
+                    $push: { voters: req.userId },
+                    $inc: { votes: vote === "up" ? 1 : -1 },
+                }, { new: true });
+                console.log(yield artifactModel_1.default.findById(artifactId));
+                console.log(test);
+                res.status(202).send("voted for Artifact");
             }
             else {
-                //user has not voted
-                yield artifactModel_1.default.updateOne({ _id: artifactId }, {
-                    $inc: { votes: vote === "up" ? 1 : -1 },
-                    $push: { voters: req.userId },
-                });
-                res.status(202).send("Vote successful");
+                res.status(403).send("Cant vote for your own artifact");
             }
         }
         catch (error) {
-            console.error(error);
             res.status(500).send("Invalid artifact id");
         }
     }
@@ -174,6 +175,42 @@ router.post("/delete", (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
     else {
         res.status(500).send("Invalid request body ");
+    }
+}));
+//get showcase artifacts
+router.get("/showcase-artifacts", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const artifacts = yield artifactModel_1.default.find({ showcase: true })
+            .sort({ votes: -1 }) // sort in descending order based on "votes"
+            .limit(49)
+            .populate("owner");
+        res.status(200).send(artifacts);
+    }
+    catch (error) {
+        res.status(500).send("Error getting artifacts");
+    }
+}));
+router.get("/for-vote", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let randomArtifacts = yield artifactModel_1.default.aggregate([
+            {
+                $match: {
+                    showcase: true,
+                    owner: { $ne: new mongoose_1.default.Types.ObjectId(req.userId) },
+                    voters: { $ne: req.userId },
+                },
+            },
+            {
+                $sample: { size: req.query.num ? Math.abs(Number(req.query.num)) : 1 },
+            },
+        ]);
+        randomArtifacts = randomArtifacts.filter((obj, index) => randomArtifacts.findIndex((item) => item._id === obj._id) === index);
+        yield userModel_1.default.populate(randomArtifacts, { path: "owner" });
+        res.status(200).send(randomArtifacts);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).send("Error getting artifacts");
     }
 }));
 exports.default = router;

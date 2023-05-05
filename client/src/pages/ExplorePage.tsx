@@ -21,7 +21,7 @@ import {
 } from "@chakra-ui/react";
 
 import { Navigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { ArtifactType } from "../types/artifactType";
 import axios from "axios";
 import artifactFormatter from "../utils/arifactFormatter";
@@ -30,7 +30,7 @@ import { FiArrowUp } from "react-icons/fi";
 
 const testArtifact: ArtifactType = {
   _id: "644da0d5a21f019a1a111744",
-  owner: "6446e3a275cfc11c05f4457b",
+  owner: { username: "D", pfp: "d" },
   locked: false,
   showcase: false,
   artifactData: {
@@ -51,14 +51,52 @@ const testArtifact: ArtifactType = {
   votes: 0,
 };
 
-function VoteArtifact({ thisArtifact }: { thisArtifact: ArtifactType }) {
+function VoteArtifact({
+  thisArtifact,
+  setForVoteArtifacts,
+  forVoteArtifacts,
+}: {
+  thisArtifact: ArtifactType;
+  setForVoteArtifacts: Dispatch<SetStateAction<ArtifactType[]>>;
+  forVoteArtifacts: Array<ArtifactType>;
+}) {
+  function Vote(typeOfVote: string) {
+    axios
+      .post(
+        import.meta.env.VITE_API_URI + "/artifact/vote",
+        { artifactId: thisArtifact._id, vote: typeOfVote },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        axios
+          .get(import.meta.env.VITE_API_URI + `/artifact/for-vote?num=3`, {
+            withCredentials: true,
+          })
+          .then((res) => {
+            setForVoteArtifacts(res.data);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   const formattedArtifactData = artifactFormatter(thisArtifact);
 
   return (
     <Flex direction="column">
       <Flex mt="0px" justifyContent="center" gap={1} p="10px">
-        <Avatar size="xs" />
-        <Text as="i">Gatuno7000</Text>
+        <Avatar
+          size="xs"
+          name={thisArtifact.owner?.username}
+          src={thisArtifact.owner?.pfp}
+        />
+        <Text as="i">{thisArtifact.owner?.username}</Text>
       </Flex>
 
       <Flex
@@ -131,14 +169,18 @@ function VoteArtifact({ thisArtifact }: { thisArtifact: ArtifactType }) {
             aria-label="upvote"
             icon={<BiLike />}
             w="50%"
-            onClick={() => {}}
+            onClick={() => {
+              Vote("up");
+            }}
           />
 
           <IconButton
-            aria-label="upvote"
+            aria-label="downvote"
             icon={<BiDislike />}
             w="50%"
-            onClick={() => {}}
+            onClick={() => {
+              Vote("down");
+            }}
           />
         </Center>
       </Flex>
@@ -157,7 +199,6 @@ function ShowcaseArtifact({ thisArtifact }: { thisArtifact: ArtifactType }) {
           {thisArtifact.votes}
         </Text>
       </Flex>
-
       <Flex direction="column" alignItems="center">
         <Image h="75px" w="75px" src={formattedArtifactData?.image} />
         <Stack spacing={1} align={"center"} mb={2}>
@@ -212,8 +253,12 @@ function ShowcaseArtifact({ thisArtifact }: { thisArtifact: ArtifactType }) {
         </List>
       </Flex>
       <Flex mt="10px" justifyContent="center" gap={1} p="10px">
-        <Avatar size="xs" />
-        <Text as="i">Gatuno7000</Text>
+        <Avatar
+          name={thisArtifact.owner.username}
+          size="xs"
+          src={thisArtifact.owner.pfp}
+        />
+        <Text as="i"> {thisArtifact.owner.username}</Text>
       </Flex>
     </Box>
   );
@@ -229,22 +274,44 @@ export default function ExplorePage() {
   const [showcaseArtifacts, setShowcaseArtifacts] = useState<
     Array<ArtifactType>
   >([]);
+  const [forVoteArtifacts, setForVoteArtifacts] = useState<Array<ArtifactType>>(
+    []
+  );
 
   useEffect(() => {
     setLoadingArtifacts(true);
-
     axios
-      .get(import.meta.env.VITE_API_URI + "/user/artifacts", {
+      .get(import.meta.env.VITE_API_URI + "/artifact/showcase-artifacts", {
         withCredentials: true,
       })
       .then((res) => {
-        //set shcase artifact
+        //set showcase artifact
         setShowcaseArtifacts(res.data);
         setLoadingArtifacts(false);
       })
       .catch((err) => {
         console.log(err);
       });
+  }, []);
+
+  let initialized = false;
+
+  useEffect(() => {
+    if (!initialized && forVoteArtifacts.length < 3) {
+      initialized = true;
+      //load 3 vote artifacts
+
+      axios
+        .get(import.meta.env.VITE_API_URI + "/artifact/for-vote?num=3", {
+          withCredentials: true,
+        })
+        .then((res) => {
+          setForVoteArtifacts(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   }, []);
 
   return (
@@ -255,9 +322,23 @@ export default function ExplorePage() {
             Vote for Artifacts
           </Heading>
           <SimpleGrid gap={5} columns={1} minChildWidth="350px">
-            <VoteArtifact thisArtifact={testArtifact} />
-            <VoteArtifact thisArtifact={testArtifact} />
-            <VoteArtifact thisArtifact={testArtifact} />
+            {forVoteArtifacts.length === 0 ? (
+              <Center h="300px" bg="gray.700" borderRadius="5px">
+                <Text textAlign="center">
+                  There are currently no more artifacts to vote for, come back
+                  later!
+                </Text>
+              </Center>
+            ) : (
+              forVoteArtifacts.map((artifact, i) => (
+                <VoteArtifact
+                  forVoteArtifacts={forVoteArtifacts}
+                  setForVoteArtifacts={setForVoteArtifacts}
+                  key={i}
+                  thisArtifact={artifact}
+                />
+              ))
+            )}
           </SimpleGrid>
         </Box>
       </Flex>
