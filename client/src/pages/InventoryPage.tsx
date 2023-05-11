@@ -116,9 +116,11 @@ function Searchbar({
 
 export default function InventoryPage() {
   //check if user lis logged in
+  /*
   if (localStorage.getItem("userIsLoggedIn") === "false") {
     return <Navigate to="/login" />;
   }
+  */
 
   const [loadingArtifacts, setLoadingArtifacts] = useState<boolean>(false);
   const [selectedArtifact, setSelectedArtifact] = useState<ArtifactType | null>(

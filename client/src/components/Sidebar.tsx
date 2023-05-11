@@ -25,6 +25,7 @@ import {
   BiCog,
   BiInfoCircle,
   BiLogOut,
+  BiLogIn,
 } from "react-icons/bi";
 
 import { IconType } from "react-icons";
@@ -120,7 +121,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
             axios
               .post(
                 import.meta.env.VITE_API_URI + "/user/logout",
-                {},
+                { guestId: localStorage.getItem("guestId") },
                 {
                   withCredentials: true,
                 }
@@ -128,6 +129,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
               .then((res) => {
                 localStorage.setItem("userIsLoggedIn", "false");
                 navigate("/login");
+                window.location.reload();
               })
               .catch((err) => {
                 console.log(err);
@@ -144,7 +146,33 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           />
           Log out
         </Flex>
-      ) : null}
+      ) : (
+        <Flex
+          align="center"
+          p="4"
+          mx="4"
+          borderRadius="lg"
+          role="group"
+          cursor="pointer"
+          _hover={{
+            bg: "gray.700",
+            color: "white",
+          }}
+          onClick={() => {
+            navigate("/login");
+          }}
+        >
+          <Icon
+            mr="4"
+            fontSize="16"
+            _groupHover={{
+              color: "white",
+            }}
+            as={BiLogIn}
+          />
+          Sign in
+        </Flex>
+      )}
     </Box>
   );
 };

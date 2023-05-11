@@ -13,9 +13,11 @@ import {
 
 export default function AboutPage() {
   //check if user lis logged in
+  /*
   if (localStorage.getItem("userIsLoggedIn") == "false") {
     return <Navigate to="/login" />;
   }
+  */
 
   return (
     <>

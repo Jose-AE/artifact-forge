@@ -141,26 +141,32 @@ router.post(
 router.post("/vote", async (req: Request | any, res: Response) => {
   const { artifactId, vote } = req.body;
 
-  if (typeof artifactId == "string" && (vote === "up" || vote === "down")) {
-    try {
-      if (!(await checkArtifactOwnership(artifactId, req.userId as string))) {
-        await Artifact.findOneAndUpdate(
-          { _id: artifactId, voters: { $ne: req.userId } }, // find the artifact by its ID and make sure the user is not already in the voters array
-          {
-            $push: { voters: req.userId },
-            $inc: { votes: vote === "up" ? 1 : -1 },
-          }
-        );
+  const user = await User.findById(req.userId);
 
-        res.status(202).send("voted for Artifact");
-      } else {
-        res.status(403).send("Cant vote for your own artifact");
+  if (!user.googleId.includes("-")) {
+    if (typeof artifactId == "string" && (vote === "up" || vote === "down")) {
+      try {
+        if (!(await checkArtifactOwnership(artifactId, req.userId as string))) {
+          await Artifact.findOneAndUpdate(
+            { _id: artifactId, voters: { $ne: req.userId } }, // find the artifact by its ID and make sure the user is not already in the voters array
+            {
+              $push: { voters: req.userId },
+              $inc: { votes: vote === "up" ? 1 : -1 },
+            }
+          );
+
+          res.status(202).send("voted for Artifact");
+        } else {
+          res.status(403).send("Cant vote for your own artifact");
+        }
+      } catch (error) {
+        res.status(500).send("Invalid artifact id");
       }
-    } catch (error) {
-      res.status(500).send("Invalid artifact id");
+    } else {
+      res.status(500).send("Invalid request body ");
     }
   } else {
-    res.status(500).send("Invalid request body ");
+    res.status(401).send("Guest users cant vote");
   }
 });
 router.post("/delete", async (req: Request | any, res: Response) => {

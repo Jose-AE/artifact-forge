@@ -20,7 +20,7 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { ArtifactType } from "../types/artifactType";
 import axios from "axios";
@@ -60,6 +60,8 @@ function VoteArtifact({
   setForVoteArtifacts: Dispatch<SetStateAction<ArtifactType[]>>;
   forVoteArtifacts: Array<ArtifactType>;
 }) {
+  const navigate = useNavigate();
+
   function Vote(typeOfVote: string) {
     axios
       .post(
@@ -82,7 +84,11 @@ function VoteArtifact({
           });
       })
       .catch((err) => {
-        console.log(err);
+        if (err.request.status === 401) {
+          navigate("/login");
+        } else {
+          console.log(err);
+        }
       });
   }
 
@@ -265,11 +271,6 @@ function ShowcaseArtifact({ thisArtifact }: { thisArtifact: ArtifactType }) {
 }
 
 export default function ExplorePage() {
-  //check if user lis logged in
-  if (localStorage.getItem("userIsLoggedIn") === "false") {
-    return <Navigate to="/login" />;
-  }
-
   const [loadingArtifacts, setLoadingArtifacts] = useState<boolean>(false);
   const [showcaseArtifacts, setShowcaseArtifacts] = useState<
     Array<ArtifactType>
@@ -321,7 +322,7 @@ export default function ExplorePage() {
           <Heading p="10px" mb={5}>
             Vote for Artifacts
           </Heading>
-          <SimpleGrid gap={5} columns={1} minChildWidth="200px">
+          <SimpleGrid gap={5} columns={1} minChildWidth="350px">
             {forVoteArtifacts.length === 0 ? (
               <Center h="300px" bg="gray.700" borderRadius="5px">
                 <Text textAlign="center">

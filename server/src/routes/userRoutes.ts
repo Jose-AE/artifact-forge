@@ -6,6 +6,7 @@ import Artifact from "../models/artifactModel";
 
 import * as dotenv from "dotenv";
 import verifyToken from "../middleware/verifyToken";
+import { GUEST_AVATARS } from "../data/guestAvatars";
 dotenv.config();
 
 const router = express.Router();
@@ -25,9 +26,38 @@ router.get("/artifacts", verifyToken, async (req: any, res: Response) => {
 ////
 //Logout user route
 ////
-router.post("/logout", (req: Request, res: Response) => {
-  res.clearCookie("token", { domain: process.env.COOKIE_DOMAIN });
-  res.status(200).send("User logged out");
+router.post("/logout", async (req: Request, res: Response) => {
+  const { guestId } = req.body;
+
+  if (guestId) {
+    try {
+      const guestUser = await User.findOne({ googleId: guestId });
+
+      const token = jwt.sign(
+        {
+          userId: guestUser._id,
+          username: guestUser.username,
+          pfp: guestUser.pfp,
+        },
+        process.env.JWT_SECRET as string
+      );
+
+      res.cookie("token", token, {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 30, // 14 Day Age,
+        domain: process.env.COOKIE_DOMAIN,
+        sameSite: "lax",
+      });
+
+      res.status(200).send("User logged out");
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Error logging out");
+    }
+  } else {
+    res.clearCookie("token");
+    res.status(200).send("User logged out");
+  }
 });
 
 ////
@@ -54,7 +84,7 @@ router.get("/get", (req: Request, res: Response) => {
 ////
 //Login user route
 ////
-router.post("/login", (req: Request, res: Response) => {
+router.post("/login", async (req: Request, res: Response) => {
   const { googleAccessToken } = req.body;
 
   axios
@@ -71,10 +101,15 @@ router.post("/login", (req: Request, res: Response) => {
       const existingUser = await User.findOne({ googleId });
 
       if (!existingUser) {
-        //create new user
+        //upgrade guest account
+
+        const { userId } = jwt.verify(
+          req.cookies.token,
+          process.env.JWT_SECRET as string
+        ) as any;
 
         try {
-          const createdUser = await User.create({
+          const updatedUser = await User.findByIdAndUpdate(userId, {
             googleId,
             username,
             pfp,
@@ -82,7 +117,7 @@ router.post("/login", (req: Request, res: Response) => {
 
           const token = jwt.sign(
             {
-              userId: createdUser._id,
+              userId: updatedUser._id,
               username,
               pfp,
             },
@@ -96,7 +131,7 @@ router.post("/login", (req: Request, res: Response) => {
             sameSite: "lax",
           });
 
-          res.status(201).send({ pfp, username });
+          res.status(201).send("created");
         } catch (error) {
           console.log(error);
           res.status(500).send("Server error creating user");
@@ -121,15 +156,55 @@ router.post("/login", (req: Request, res: Response) => {
             sameSite: "lax",
           });
 
-          res.status(202).send({ pfp, username });
+          res.status(202).send("Account logged in");
         } catch (error) {
           res.status(500).send("Server error validating user token");
         }
       }
     })
     .catch((err) => {
-      res.status(400).json({ message: "Invalid access token!" });
+      console.log(err);
+      res.status(400).send("Invalid google access token!");
     });
+});
+
+router.post("/create-guest", async (req: Request, res: Response) => {
+  const { guestId } = req.body;
+
+  try {
+    //random pfp
+    const pfp = GUEST_AVATARS[Math.floor(Math.random() * GUEST_AVATARS.length)];
+
+    // username
+    const username = "Guest";
+
+    const createdUser = await User.create({
+      googleId: guestId,
+      username,
+      pfp,
+    });
+
+    const token = jwt.sign(
+      {
+        userId: createdUser._id,
+        username,
+        pfp,
+      },
+      process.env.JWT_SECRET as string
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 30, // 14 Day Age,
+      domain: process.env.COOKIE_DOMAIN,
+      sameSite: "lax",
+    });
+
+    res.status(201).send("Guest account created");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Server error creating guest user");
+  }
 });
 
 export default router;

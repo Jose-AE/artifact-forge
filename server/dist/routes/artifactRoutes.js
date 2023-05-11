@@ -131,26 +131,32 @@ router.post("/switch-showcase", (req, res) => __awaiter(void 0, void 0, void 0, 
 }));
 router.post("/vote", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { artifactId, vote } = req.body;
-    if (typeof artifactId == "string" && (vote === "up" || vote === "down")) {
-        try {
-            if (!(yield checkArtifactOwnership(artifactId, req.userId))) {
-                yield artifactModel_1.default.findOneAndUpdate({ _id: artifactId, voters: { $ne: req.userId } }, // find the artifact by its ID and make sure the user is not already in the voters array
-                {
-                    $push: { voters: req.userId },
-                    $inc: { votes: vote === "up" ? 1 : -1 },
-                });
-                res.status(202).send("voted for Artifact");
+    const user = yield userModel_1.default.findById(req.userId);
+    if (!user.googleId.includes("-")) {
+        if (typeof artifactId == "string" && (vote === "up" || vote === "down")) {
+            try {
+                if (!(yield checkArtifactOwnership(artifactId, req.userId))) {
+                    yield artifactModel_1.default.findOneAndUpdate({ _id: artifactId, voters: { $ne: req.userId } }, // find the artifact by its ID and make sure the user is not already in the voters array
+                    {
+                        $push: { voters: req.userId },
+                        $inc: { votes: vote === "up" ? 1 : -1 },
+                    });
+                    res.status(202).send("voted for Artifact");
+                }
+                else {
+                    res.status(403).send("Cant vote for your own artifact");
+                }
             }
-            else {
-                res.status(403).send("Cant vote for your own artifact");
+            catch (error) {
+                res.status(500).send("Invalid artifact id");
             }
         }
-        catch (error) {
-            res.status(500).send("Invalid artifact id");
+        else {
+            res.status(500).send("Invalid request body ");
         }
     }
     else {
-        res.status(500).send("Invalid request body ");
+        res.status(401).send("Guest users cant vote");
     }
 }));
 router.post("/delete", (req, res) => __awaiter(void 0, void 0, void 0, function* () {

@@ -42,6 +42,7 @@ const userModel_1 = __importDefault(require("../models/userModel"));
 const artifactModel_1 = __importDefault(require("../models/artifactModel"));
 const dotenv = __importStar(require("dotenv"));
 const verifyToken_1 = __importDefault(require("../middleware/verifyToken"));
+const guestAvatars_1 = require("../data/guestAvatars");
 dotenv.config();
 const router = express_1.default.Router();
 ////
@@ -59,10 +60,34 @@ router.get("/artifacts", verifyToken_1.default, (req, res) => __awaiter(void 0, 
 ////
 //Logout user route
 ////
-router.post("/logout", (req, res) => {
-    res.clearCookie("token", { domain: process.env.COOKIE_DOMAIN });
-    res.status(200).send("User logged out");
-});
+router.post("/logout", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { guestId } = req.body;
+    if (guestId) {
+        try {
+            const guestUser = yield userModel_1.default.findOne({ googleId: guestId });
+            const token = jsonwebtoken_1.default.sign({
+                userId: guestUser._id,
+                username: guestUser.username,
+                pfp: guestUser.pfp,
+            }, process.env.JWT_SECRET);
+            res.cookie("token", token, {
+                httpOnly: true,
+                maxAge: 1000 * 60 * 60 * 24 * 30,
+                domain: process.env.COOKIE_DOMAIN,
+                sameSite: "lax",
+            });
+            res.status(200).send("User logged out");
+        }
+        catch (err) {
+            console.log(err);
+            res.status(500).send("Error logging out");
+        }
+    }
+    else {
+        res.clearCookie("token");
+        res.status(200).send("User logged out");
+    }
+}));
 ////
 //Get logged user route
 ////
@@ -84,7 +109,7 @@ router.get("/get", (req, res) => {
 ////
 //Login user route
 ////
-router.post("/login", (req, res) => {
+router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { googleAccessToken } = req.body;
     axios_1.default
         .get("https://www.googleapis.com/oauth2/v3/userinfo", {
@@ -98,15 +123,16 @@ router.post("/login", (req, res) => {
         const pfp = response.data.picture;
         const existingUser = yield userModel_1.default.findOne({ googleId });
         if (!existingUser) {
-            //create new user
+            //upgrade guest account
+            const { userId } = jsonwebtoken_1.default.verify(req.cookies.token, process.env.JWT_SECRET);
             try {
-                const createdUser = yield userModel_1.default.create({
+                const updatedUser = yield userModel_1.default.findByIdAndUpdate(userId, {
                     googleId,
                     username,
                     pfp,
                 });
                 const token = jsonwebtoken_1.default.sign({
-                    userId: createdUser._id,
+                    userId: updatedUser._id,
                     username,
                     pfp,
                 }, process.env.JWT_SECRET);
@@ -116,7 +142,7 @@ router.post("/login", (req, res) => {
                     domain: process.env.COOKIE_DOMAIN,
                     sameSite: "lax",
                 });
-                res.status(201).send({ pfp, username });
+                res.status(201).send("created");
             }
             catch (error) {
                 console.log(error);
@@ -137,7 +163,7 @@ router.post("/login", (req, res) => {
                     domain: process.env.COOKIE_DOMAIN,
                     sameSite: "lax",
                 });
-                res.status(202).send({ pfp, username });
+                res.status(202).send("Account logged in");
             }
             catch (error) {
                 res.status(500).send("Server error validating user token");
@@ -145,8 +171,39 @@ router.post("/login", (req, res) => {
         }
     }))
         .catch((err) => {
-        res.status(400).json({ message: "Invalid access token!" });
+        console.log(err);
+        res.status(400).send("Invalid google access token!");
     });
-});
+}));
+router.post("/create-guest", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { guestId } = req.body;
+    try {
+        //random pfp
+        const pfp = guestAvatars_1.GUEST_AVATARS[Math.floor(Math.random() * guestAvatars_1.GUEST_AVATARS.length)];
+        // username
+        const username = "Guest";
+        const createdUser = yield userModel_1.default.create({
+            googleId: guestId,
+            username,
+            pfp,
+        });
+        const token = jsonwebtoken_1.default.sign({
+            userId: createdUser._id,
+            username,
+            pfp,
+        }, process.env.JWT_SECRET);
+        res.cookie("token", token, {
+            httpOnly: true,
+            maxAge: 1000 * 60 * 60 * 24 * 30,
+            domain: process.env.COOKIE_DOMAIN,
+            sameSite: "lax",
+        });
+        res.status(201).send("Guest account created");
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).send("Server error creating guest user");
+    }
+}));
 exports.default = router;
 //# sourceMappingURL=userRoutes.js.map

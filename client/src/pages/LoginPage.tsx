@@ -94,7 +94,7 @@ function Artifact({
       borderRadius="10px"
     >
       <Flex p={6} direction="column" alignItems="center">
-        <Image h="300px" w="300px" src={img} />
+        <Image h="250px" w="250px" src={img} />
         <Stack spacing={3} align={"center"} mb={3}>
           <Box
             p="7px"
@@ -144,6 +144,9 @@ function LoginButton() {
         )
         .then((res) => {
           localStorage.setItem("userIsLoggedIn", "true");
+          if (res.data === "created") {
+            localStorage.removeItem("guestId");
+          }
           navigate("/");
         })
         .catch((err) => {
@@ -173,14 +176,16 @@ export default function LoginPage() {
 
   return (
     <>
-      <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
+      <Stack spacing={8} mx={"auto"} maxW="600px" py={12} px={6}>
         <Stack align={"center"}>
           <Heading textAlign="center" fontSize={"4xl"}>
-            Start forging artifacts!
+            Access your inventory from anywhere and vote for artifacts!
           </Heading>
           <Text fontSize={"20px"} textAlign="center" color={"gray.300"}>
-            Sign in to start forging artifacts, save them to your inventory,
-            share them with other users and access them from anywhere!
+            If you already have an account, simply sign in to gain instant
+            access to your artifact inventory. If you're new, we'll create an
+            account for you where we'll also transfer all your current guest
+            artifacts to your new account.
           </Text>
         </Stack>
         <LoginButton />
