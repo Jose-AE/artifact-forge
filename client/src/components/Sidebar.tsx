@@ -160,6 +160,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           }}
           onClick={() => {
             navigate("/login");
+            window.location.reload();
           }}
         >
           <Icon
