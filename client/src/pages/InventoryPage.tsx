@@ -11,9 +11,10 @@ import {
   CloseButton,
   Spinner,
   Center,
+  Heading,
 } from "@chakra-ui/react";
 
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 import { useState, useRef, useEffect, SetStateAction, Dispatch } from "react";
 import { ArtifactType } from "../types/artifactType";
@@ -115,12 +116,7 @@ function Searchbar({
 }
 
 export default function InventoryPage() {
-  //check if user lis logged in
-  /*
-  if (localStorage.getItem("userIsLoggedIn") === "false") {
-    return <Navigate to="/login" />;
-  }
-  */
+  const navigate = useNavigate();
 
   const [loadingArtifacts, setLoadingArtifacts] = useState<boolean>(false);
   const [selectedArtifact, setSelectedArtifact] = useState<ArtifactType | null>(
@@ -210,29 +206,43 @@ export default function InventoryPage() {
           <Text textAlign="center" fontWeight="semibold" ml="3px" mt="3px">
             {userArtifacts.length}/2000
           </Text>
+
           <Box h={`calc(100vh - ${220}px)`} overflowY="auto" mt="10px">
-            <Grid
-              autoRows="auto"
-              templateColumns={{
-                base: "repeat(4, minmax(0, 1fr))",
-                sm: "repeat(6, minmax(0, 1fr))",
-                md: "repeat(8, minmax(0, 1fr))",
-                lg: "repeat(12, minmax(0, 1fr))",
-                "2xl": "repeat(17, minmax(0, 1fr))",
-              }}
-              gap={3}
-            >
-              {filterAndSortArtifacts().map((artifact, i) => {
-                return (
-                  <Artifact
-                    key={i}
-                    setSelectedArtifact={setSelectedArtifact}
-                    thisArtifact={artifact}
-                    onOpen={onOpenArifactInfoModal}
-                  />
-                );
-              })}
-            </Grid>
+            {userArtifacts.length === 0 ? (
+              <Center gap={5} h="100%" flexDirection="column">
+                <Heading>Your inventory is empty</Heading>
+                <Button
+                  onClick={() => {
+                    navigate("/");
+                  }}
+                >
+                  Generate some artifacts!
+                </Button>
+              </Center>
+            ) : (
+              <Grid
+                autoRows="auto"
+                templateColumns={{
+                  base: "repeat(4, minmax(0, 1fr))",
+                  sm: "repeat(6, minmax(0, 1fr))",
+                  md: "repeat(8, minmax(0, 1fr))",
+                  lg: "repeat(12, minmax(0, 1fr))",
+                  "2xl": "repeat(17, minmax(0, 1fr))",
+                }}
+                gap={3}
+              >
+                {filterAndSortArtifacts().map((artifact, i) => {
+                  return (
+                    <Artifact
+                      key={i}
+                      setSelectedArtifact={setSelectedArtifact}
+                      thisArtifact={artifact}
+                      onOpen={onOpenArifactInfoModal}
+                    />
+                  );
+                })}
+              </Grid>
+            )}
           </Box>
         </>
       )}

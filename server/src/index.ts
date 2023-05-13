@@ -1,4 +1,4 @@
-const TEST_MODE = true;
+const TEST_MODE = false;
 
 import express, { Request, Response } from "express";
 import cors from "cors";
