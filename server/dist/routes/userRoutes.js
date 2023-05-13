@@ -45,6 +45,19 @@ const verifyToken_1 = __importDefault(require("../middleware/verifyToken"));
 const guestAvatars_1 = require("../data/guestAvatars");
 dotenv.config();
 const router = express_1.default.Router();
+///
+//Verify jwt
+///
+router.get("/verify-token", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.cookies.token;
+    try {
+        jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        res.status(200).send("valid");
+    }
+    catch (err) {
+        res.status(200).send("invalid");
+    }
+}));
 ////
 //Get logged user artifacts
 ////
@@ -72,7 +85,7 @@ router.post("/logout", (req, res) => __awaiter(void 0, void 0, void 0, function*
             }, process.env.JWT_SECRET);
             res.cookie("token", token, {
                 httpOnly: true,
-                maxAge: 1000 * 60 * 60 * 24 * 30,
+                maxAge: 1000 * 60 * 60 * 24 * 30 * 12 * 10,
                 domain: process.env.COOKIE_DOMAIN,
                 sameSite: "lax",
             });
@@ -194,7 +207,7 @@ router.post("/create-guest", (req, res) => __awaiter(void 0, void 0, void 0, fun
         }, process.env.JWT_SECRET);
         res.cookie("token", token, {
             httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 24 * 30,
+            maxAge: 1000 * 60 * 60 * 24 * 30 * 12 * 10,
             domain: process.env.COOKIE_DOMAIN,
             sameSite: "lax",
         });

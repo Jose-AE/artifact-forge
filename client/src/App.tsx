@@ -8,40 +8,83 @@ import ExplorePage from "./pages/ExplorePage";
 import { Analytics } from "@vercel/analytics/react";
 import LoginPage from "./pages/LoginPage";
 import { v4 as uuidv4 } from "uuid";
+import { useEffect } from "react";
 
-interface UserInterface {
-  username: string;
-  pfp: string;
+async function verifyToken() {
+  //check if jwt is still valid
+  try {
+    await axios
+      .get(import.meta.env.VITE_API_URI + "/user/verify-token", {
+        withCredentials: true,
+      })
+      .then((res) => {
+        if (res.data === "invalid") {
+          loginAsGuest();
+        }
+      })
+      .catch((err) => {});
+  } catch (err) {}
 }
 
-function App() {
-  //if first time user log in as guest
-  if (
-    !localStorage.getItem("guestId") &&
-    localStorage.getItem("userIsLoggedIn") === "false"
-  ) {
-    const guestId = uuidv4();
-    localStorage.setItem("guestId", guestId);
+function loginAsGuest() {
+  localStorage.setItem("userIsLoggedIn", "false");
+  if (!localStorage.getItem("guestId")) {
+    localStorage.setItem("guestId", uuidv4());
 
     axios
       .post(
         import.meta.env.VITE_API_URI + "/user/create-guest",
         {
-          guestId: guestId,
+          guestId: localStorage.getItem("guestId"),
         },
         { withCredentials: true }
       )
-      .then((res) => {})
+      .then((res) => {
+        console.log("gest acc created");
+      })
       .catch((err) => {
         localStorage.removeItem("guestId");
         console.log(err);
       });
+  } else {
+    axios
+      .post(
+        import.meta.env.VITE_API_URI + "/user/logout",
+        { guestId: localStorage.getItem("guestId") },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {})
+      .catch((err) => {
+        console.log(err);
+      });
   }
+}
 
-  if (!localStorage.getItem("userIsLoggedIn")) {
-    localStorage.setItem("userIsLoggedIn", "false");
-  }
+function App() {
+  let AppMounted = false;
+  useEffect(() => {
+    if (!AppMounted) {
+      verifyToken();
+      AppMounted = true;
+    }
+  }, []);
 
+  /*
+  let AppMounted = false;
+  useEffect(() => {
+    if (!AppMounted) {
+      //if first time visit log in as guest
+      if (!localStorage.getItem("userIsLoggedIn")) {
+        loginAsGuest();
+      } else {
+        //if returning user verify token
+      }
+      AppMounted = true;
+    }
+  }, []);
+*/
   return (
     <>
       <Analytics />

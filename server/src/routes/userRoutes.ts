@@ -11,6 +11,20 @@ dotenv.config();
 
 const router = express.Router();
 
+///
+//Verify jwt
+///
+router.get("/verify-token", async (req: any, res: Response) => {
+  const token = req.cookies.token;
+
+  try {
+    jwt.verify(token, process.env.JWT_SECRET as string) as any;
+    res.status(200).send("valid");
+  } catch (err) {
+    res.status(200).send("invalid");
+  }
+});
+
 ////
 //Get logged user artifacts
 ////
@@ -44,7 +58,7 @@ router.post("/logout", async (req: Request, res: Response) => {
 
       res.cookie("token", token, {
         httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24 * 30, // 14 Day Age,
+        maxAge: 1000 * 60 * 60 * 24 * 30 * 12 * 10, // 10 years
         domain: process.env.COOKIE_DOMAIN,
         sameSite: "lax",
       });
@@ -126,7 +140,7 @@ router.post("/login", async (req: Request, res: Response) => {
 
           res.cookie("token", token, {
             httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 24 * 30, // 14 Day Age,
+            maxAge: 1000 * 60 * 60 * 24 * 30, // 30 Day Age,
             domain: process.env.COOKIE_DOMAIN,
             sameSite: "lax",
           });
@@ -151,7 +165,7 @@ router.post("/login", async (req: Request, res: Response) => {
 
           res.cookie("token", token, {
             httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 24 * 30, // 14 Day Age,
+            maxAge: 1000 * 60 * 60 * 24 * 30, // 30 Day Age,
             domain: process.env.COOKIE_DOMAIN,
             sameSite: "lax",
           });
@@ -195,7 +209,7 @@ router.post("/create-guest", async (req: Request, res: Response) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 30, // 14 Day Age,
+      maxAge: 1000 * 60 * 60 * 24 * 30 * 12 * 10, // 10 years
       domain: process.env.COOKIE_DOMAIN,
       sameSite: "lax",
     });

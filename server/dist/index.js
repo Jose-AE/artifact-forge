@@ -26,6 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const TEST_MODE = true;
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -53,7 +54,9 @@ const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 app.use("/user", userRoutes_1.default);
 app.use("/artifact", verifyToken_1.default, artifactRoutes_1.default);
 const PORT = process.env.PORT || 3000;
-mongoose_1.default.connect(process.env.DB_URI, {
+mongoose_1.default.connect(TEST_MODE
+    ? process.env.TEST_DB_URI
+    : process.env.DB_URI, {
     dbName: "Main",
 });
 app.get("/", (req, res) => {

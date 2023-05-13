@@ -1,3 +1,5 @@
+const TEST_MODE = true;
+
 import express, { Request, Response } from "express";
 import cors from "cors";
 import mongoose, { Mongoose } from "mongoose";
@@ -35,9 +37,14 @@ app.use("/artifact", verifyToken, artifactRoutes);
 
 const PORT = process.env.PORT || 3000;
 
-mongoose.connect(process.env.DB_URI as string, {
-  dbName: "Main",
-});
+mongoose.connect(
+  TEST_MODE
+    ? (process.env.TEST_DB_URI as string)
+    : (process.env.DB_URI as string),
+  {
+    dbName: "Main",
+  }
+);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Artifact Forge API 1.0");
