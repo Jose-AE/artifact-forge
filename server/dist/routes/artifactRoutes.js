@@ -30,7 +30,7 @@ router.post("/generate", (req, res) => __awaiter(void 0, void 0, void 0, functio
     if (typeof domain == "number") {
         try {
             const userArtifacts = yield artifactModel_1.default.find({ owner: req.userId });
-            if (userArtifacts.length < 500) {
+            if (userArtifacts.length < 2000) {
                 const createdArtifact = yield artifactModel_1.default.create({
                     owner: req.userId,
                     locked: false,

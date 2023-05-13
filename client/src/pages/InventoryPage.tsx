@@ -208,7 +208,7 @@ export default function InventoryPage() {
       ) : (
         <>
           <Text textAlign="center" fontWeight="semibold" ml="3px" mt="3px">
-            {userArtifacts.length}/500
+            {userArtifacts.length}/2000
           </Text>
           <Box h={`calc(100vh - ${220}px)`} overflowY="auto" mt="10px">
             <Grid

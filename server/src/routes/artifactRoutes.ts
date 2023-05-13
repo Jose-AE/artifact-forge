@@ -26,7 +26,7 @@ router.post("/generate", async (req: Request | any, res: Response) => {
   if (typeof domain == "number") {
     try {
       const userArtifacts = await Artifact.find({ owner: req.userId });
-      if (userArtifacts.length < 500) {
+      if (userArtifacts.length < 2000) {
         const createdArtifact = await Artifact.create({
           owner: req.userId,
           locked: false,
